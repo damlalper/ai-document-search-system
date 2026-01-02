@@ -1,0 +1,166 @@
+# 👥 Proje İş Bölüşümü ve Paralel Geliştirme Planı
+**Proje:** Akıllı Doküman Arama ve Özetleme Sistemi  
+**Ders:** BİL440 – YZ Destekli Yazılım Geliştirme  
+**Grup:** 2 Kişi (Eşli Programlama + Paralel Geliştirme)
+
+---
+
+## 🎯 Amaç
+
+Bu doküman, projenin:
+- bilinçli iş bölüşümüyle,
+- GitHub üzerinden **paralel geliştirme** yapılarak,
+- yapay zekâ destekli fakat **insan kontrollü** bir mühendislik yaklaşımıyla
+
+nasıl geliştirileceğini açıklamak amacıyla hazırlanmıştır.
+
+---
+
+## 🧠 Temel Yaklaşım
+
+Bu projede iş bölüşümü **“frontend / backend”** şeklinde yüzeysel değil;
+
+> **sorumluluk alanları ve karar türleri** üzerinden yapılmıştır.
+
+Amaç:
+- Yapay zekânın **nerede kullanıldığı**
+- Nerede **bilinçli olarak kullanılmadığı**
+- İnsan müdahalesinin **neden kritik olduğu**
+
+noktaları net biçimde ayırabilmektir.
+
+---
+
+## 👤 Rol Dağılımı
+
+### 👤 Kişi A – Backend & AI Odaklı Geliştirici
+
+**Sorumluluk Alanları:**
+- Backend mimarisi (FastAPI)
+- Doküman yükleme ve saklama
+- PDF / metin çıkarımı (klasik yöntemler)
+- Anahtar kelime tabanlı arama
+- RAG (Retrieval-Augmented Generation) pipeline
+- AI destekli:
+  - soru-cevap üretimi
+  - özetleme
+- Kaynak atfı (cevabın hangi dokümana dayandığı)
+- Bilinçli olarak **yanlış / eksik AI çıktısı üretimi**
+- AI Decision Log’un teknik kararları
+
+**YZ Odak Noktası:**
+- AI nerede katma değer sağlıyor?
+- Nerede kullanılmaması daha doğru?
+- AI önerileri neden kabul / reddedildi?
+
+---
+
+### 👤 Kişi B – Frontend, UX & Dokümantasyon Odaklı Geliştirici
+
+**Sorumluluk Alanları:**
+- Frontend arayüzleri:
+  - Doküman yükleme ekranı
+  - Arama ekranı
+  - Soru-cevap ekranı
+- Kullanıcı hikâyeleri (AI-assisted)
+- UML diyagramları (Component / Sequence)
+- AI destekli:
+  - unit testler
+  - edge-case senaryoları
+- Yanlış AI çıktısının:
+  - kullanıcıya etkisi
+  - nasıl fark edildiği
+- Test ve etik değerlendirme katkıları
+
+**YZ Odak Noktası:**
+- AI çıktısının kullanıcı deneyimine etkisi
+- Yanıltıcı AI davranışlarının tespiti
+
+---
+
+## 🌿 GitHub Paralel Geliştirme Modeli
+
+### Ana Branch’ler
+
+```text
+main        → stabil, teslim edilebilir sürüm
+develop     → entegrasyon branch’i
+Feature Branch Yapısı
+Kişi A:
+
+text
+Kodu kopyala
+feature/backend-rag
+feature/backend-search
+Kişi B:
+
+text
+Kodu kopyala
+feature/frontend-ui
+feature/docs-tests
+Çalışma Akışı
+Her geliştirme feature/ branch’inde yapılır
+
+Küçük ve açıklayıcı commit’ler atılır
+
+develop branch’ine Pull Request açılır
+
+Diğer grup üyesi kodu review eder
+
+Gerekirse düzeltme yapılır
+
+Merge edilir
+
+Bu süreç, raporda:
+
+“AI önerileri insan kontrolüyle değerlendirildi”
+şeklinde belgelenebilecek somut bir mühendislik pratiğidir.
+
+🏷️ Commit Mesajı Standardı
+Her commit mesajında etiket zorunludur:
+
+[AI-generated]
+
+[AI-assisted]
+
+[Human-written]
+
+Örnekler:
+
+text
+Kodu kopyala
+[AI-assisted] Initial RAG pipeline design with human validation
+[Human-written] PDF text extraction using classical methods
+[AI-generated] First draft of summarization logic (reviewed)
+AI-generated commit’lerde:
+
+Prompt paylaşılacak
+
+İnsan müdahalesi açıklanacaktır
+
+🧪 Bilinçli Yanlış AI Çıktısı
+Projede en az bir adet:
+
+eksik,
+
+hatalı veya
+
+yanıltıcı
+
+AI çıktısı bilinçli olarak üretilecek, ardından:
+
+Neden yanlış olduğu
+
+Nasıl fark edildiği
+
+Nasıl önlem alındığı
+
+rapor ve sunumda detaylandırılacaktır.
+
+🏁 Son Not
+Bu projede amaç:
+
+“AI kod yazdı” demek değil,
+“AI ile hangi kararlara nasıl ulaştık?” sorusuna cevap verebilmektir.
+
+Bu iş bölüşümü ve geliştirme modeli, bu amacı doğrudan destekleyecek şekilde tasarlanmıştır.
