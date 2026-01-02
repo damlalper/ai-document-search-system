@@ -53,10 +53,26 @@ uvicorn app.main:app --reload
 
 ## API Endpoints
 
-- `POST /api/v1/documents/upload` - Upload PDF document
-- `GET /api/v1/documents` - List all documents
-- `GET /api/v1/documents/{doc_id}` - Get document details
-- `POST /api/v1/search` - Keyword-based search (TF-IDF)
+### ✅ Implemented (Ready for Frontend Integration)
+
+- **`GET /`** - API health check
+- **`GET /health`** - Health status
+- **`POST /api/v1/documents/upload`** - Upload PDF document
+  - Request: `multipart/form-data` with `file` field
+  - Response: `DocumentUploadResponse` (doc_id, filename, uploaded_at)
+- **`GET /api/v1/documents`** - List all documents
+  - Response: `DocumentListResponse` (documents[], total)
+- **`GET /api/v1/documents/{doc_id}`** - Get document details
+  - Response: `DocumentInfo`
+- **`DELETE /api/v1/documents/{doc_id}`** - Delete document
+  - Response: Success message
+- **`POST /api/v1/search`** - Keyword-based search (TF-IDF, NO AI)
+  - Request: `SearchRequest` (query, top_k)
+  - Response: `SearchResponse` (query, results[], total_found)
+- **`POST /api/v1/search/rebuild-index`** - Manually rebuild search index
+
+### 🚧 Not Yet Implemented (AI Router - Requires Gemini/Copilot Consultation)
+
 - `POST /api/v1/ai/summarize` - AI-powered summarization
 - `POST /api/v1/ai/qa` - AI-powered question answering
 
