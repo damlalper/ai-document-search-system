@@ -8,7 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
 from app.config import settings
-# from app.routers import documents, search, ai  # Will be uncommented after routers are implemented
+from app.routers import documents, search
+from app.services.search_service import search_service
+# from app.routers import ai  # AI router will be implemented later
 
 
 # Create necessary directories on startup
@@ -40,6 +42,14 @@ app.add_middleware(
 async def startup_event():
     """Run on application startup"""
     create_directories()
+
+    # Load existing documents into search index
+    try:
+        search_service.load_documents()
+        print(f"✅ Search index loaded with {len(search_service.doc_ids)} documents")
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to load search index: {str(e)}")
+
     print(f"🚀 {settings.app_name} v{settings.app_version} started")
     print(f"📁 Upload directory: {settings.upload_dir}")
     print(f"📄 Extracted text directory: {settings.extracted_dir}")
@@ -67,7 +77,7 @@ async def health_check():
     return {"status": "healthy"}
 
 
-# Register routers (will be uncommented after implementation)
-# app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
-# app.include_router(search.router, prefix="/api/v1", tags=["search"])
-# app.include_router(ai.router, prefix="/api/v1", tags=["ai"])
+# Register routers
+app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
+app.include_router(search.router, prefix="/api/v1", tags=["search"])
+# app.include_router(ai.router, prefix="/api/v1", tags=["ai"])  # AI router will be implemented later
