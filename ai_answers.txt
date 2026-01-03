@@ -1,0 +1,754 @@
+ai_answers
+
+SORU: 
+Bu proje için:
+- Hangi framework? (React/Vue/Svelte)
+- Hangi build tool? (Vite/CRA/Next.js)
+
+Proje özellikleri: PDF yükleme, arama, doküman listeleme, AI soru-cevap.
+Basit bir SPA olacak.
+
+GEMINI:
+Framework: React (Dokümantasyonunuzda halihazırda React
+     örnekleri mevcut).
+   * Build Tool: Vite (Hızlı, modern standart ve dokümanınızda port
+     5173 referansı var).
+   * Dil: TypeScript (Backend veri yapılarıyla tip güvenliği
+     sağlamak için).
+   * UI Kütüphanesi: Material UI (MUI) (Material Design
+     prensiplerine uygun, şık ve hızlı arayüz için).
+
+CHATGPT:
+🎯 Final Karar (Kısa Cevap)
+✔ Framework: React
+✔ Build Tool: Vite
+❌ CRA: Deprecated
+❌ Next.js: Overkill
+
+COPILOT:
+Eğer server-side rendering (SEO veya pre-render) gerekirse Next.js veya SvelteKit tercih edin; ama yalnızca SPA ise Vite daha basit ve hızlı.
+Eğer takımınız React biliyorsa React + Vite + TypeScript ile ilerleyin; yoksa daha basit öğrenme eğrisi için Vue + Vite iyi bir alternatiftir.
+
+
+SORU:
+Bu proje için state management gerekli mi?
+
+Özellikler:
+- Döküman listesi
+- Arama sonuçları
+- Upload durumu
+
+Redux mi, Context API mi, yoksa hiç mi?
+
+GEMINI:
+Bu proje ölçeği için Redux kesinlikle overkill (gereksiz
+  karmaşık) olur.
+
+  Önerim: Context API.
+Planlanan Yapı (Context API ile)
+
+  Basit bir DocumentContext oluşturacağız. Şunları içerecek:
+
+   * State: documents (liste), loading (boolean), error (string).
+   * Actions: refreshDocuments() (API'den çeker), addDocument()
+     (API'ye atar ve listeyi yeniler).
+
+CHATGPT:
+Önerilen Mimari (En Temiz Hali)
+Global (Context):
+  - documents[]
+Local State:
+  - searchQuery
+  - searchResults
+  - uploadStatus
+  - aiAnswer
+Yani:
+Veri → Context
+UI durumu → Local
+
+Net Karar Özeti
+İhtiyaç	Çözüm
+Doküman listesi	Context API
+Arama sonuçları	Local state
+Upload durumu	Local state
+Global store	❌ Yok
+Redux	❌ Gerekmez
+
+COPILOT:
+Kısa cevap: Redux gerekmez.
+Tercih: Server-state için TanStack Query (React Query); upload durumu için lokal state (gerekirse küçük Context veya Zustand ile paylaşın).
+Upload: useMutation(uploadFile, { onSuccess: () => queryClient.invalidateQueries('documents') })
+Search: useQuery(['search', term], () => fetchSearch(term))
+
+
+SORU:
+Backend API çağrıları için:
+- Native fetch()
+- axios kütüphanesi
+- React Query
+
+Hangisini kullanmalıyım? Neden?
+
+
+GEMINI:
+Bu proje için önerim: React Query (TanStack Query) + Axios
+  kombinasyonudur.
+  Tek başına axios veya fetch kullanırsanız, veri çekme mantığını
+  (loading state, error handling, caching) sürekli elle yazmanız
+  gerekir.
+Karar
+  React Query (veri yönetimi için) ve Axios (HTTP istekleri için)
+  kuruyorum.
+
+CHATGPT:
+✅ Native fetch() kullan
+❌ axios gerekmez
+❌ React Query kesinlikle gerekmez (hatta yanlış tercih)
+Net Karar Tablosu
+Seçenek	Karar	Gerekçe
+fetch	✅	Basit, yeterli
+axios	❌	Ek bağımlılık
+React Query	❌	Overkill
+🎯 Sonuç
+Bu projede:
+fetch = mühendis kararı
+kütüphane kullanmamak = bilinçli tercih
+AI önerisini reddetmek = artı puan
+
+COPILOT:
+Başla: React Query + native fetch (basit, hızlı).
+Geçiş yap: Eğer upload progress, token refresh interceptors, veya kapsamlı request/response intercept'leri gerekiyor ise axios ekleyip React Query queryFn’leri axios ile yazın.
+
+
+SORU:
+UI tasarımı için:
+- Tailwind CSS
+- Material UI
+- Bootstrap
+- Plain CSS/CSS Modules
+
+Hangisini kullanmalıyım? Akademik doküman sistemi için.
+
+
+GEMINI:
+Akademik bir doküman sistemi için önerim: Material UI (MUI).
+
+  Neden?
+
+   1. "Kurumsal ve Ciddi" Görünüm: Material Design, akademik ve
+      bilgi yoğunluklu sistemler (Google Scholar, Drive vb.) için
+      standartlaşmış, temiz ve güven veren bir tasarım dilidir.
+   2. Hazır Veri Bileşenleri: Projenizde kesinlikle ihtiyaç
+      duyacağınız şu bileşenler MUI'da hazırdır ve çok güçlüdür:
+       * DataGrid veya Table: Yüklenen PDF'leri listelemek,
+         sıralamak ve sayfalamak için.
+       * Card: Arama sonuçlarını ve özetleri göstermek için.
+       * CircularProgress / LinearProgress: Dosya yükleme ve AI
+         bekleme süreleri için.
+       * Dialog (Modal): Dosya detaylarını veya silme onayını
+         göstermek için.
+   3. Hız: Tailwind CSS çok esnektir ancak bileşenleri (Button,
+      Input) sıfırdan tasarlamanız gerekir. MUI'da <TextField />
+      veya <Button /> yazıp geçersiniz. Final projesi için
+      işlevselliğe odaklanmanızı sağlar.
+
+CHATGPT:
+Kısa Cevap (Net Karar)
+
+✅ Tailwind CSS kullan
+❌ Bootstrap kullanma
+⚠️ Material UI mümkün ama riskli
+❌ Plain CSS gereksiz efor
+
+Akademik doküman sistemi + SPA + BİL440 için en doğru denge Tailwind.
+
+COPILOT:
+Tavsiyem: Tailwind CSS + Headless UI/Radix (veya küçük bir komponent kütüphanesi) — esneklik, hızlı prototipleme, küçük bundle için en uygun seçim.
+Alternatif (hızlı, tam özellikli): Material UI (MUI) — hazır, erişilebilir bileşenler (DataGrid, Dialog, Snackbar) ve hızlı geliştirme için iyi.
+Kısa tavsiye 🎯
+Eğer “tam kontrol, hafif bundle ve modern görünüm” istiyorsanız: Tailwind + Headless UI/Radix.
+Eğer “çok sayıda hazır bileşen ve hızlı teslim” istiyorsanız: MUI tercih edin.
+
+
+
+SORU:
+PDF yükleme için:
+- Basit <input type="file">
+- Drag & drop kütüphanesi (react-dropzone)
+- Kendi custom component'im
+
+Hangisi daha iyi UX sağlar?
+
+
+GEMINI:
+Daha iyi bir UX (Kullanıcı Deneyimi) için kesinlikle Drag & drop
+  kütüphanesi (`react-dropzone`) öneriyorum.
+
+  Neden?
+
+   1. Modern Beklenti: Kullanıcılar artık dosya yüklerken klasörler
+      arasında gezinmek yerine masaüstünden dosyayı sürükleyip
+      bırakmaya alışıktır.
+   2. Görsel Geri Bildirim: Kullanıcı dosyayı alanın üzerine
+      getirdiğinde "Bırakmak için sürükleyin" gibi görsel ipuçları
+      vermek react-dropzone ile çok kolaydır.
+   3. Validasyon Kolaylığı: Sadece PDF dosyalarının kabul
+      edileceğini (accept: {'application/pdf': ['.pdf']}) tek
+      satırda tanımlayabilirsiniz. Yanlış dosya türünde kullanıcıyı
+      hemen uyarır.
+   4. MUI Entegrasyonu: Material UI'ın Paper bileşeni ile
+      birleştirerek çok şık bir yükleme alanı yapabiliriz.
+
+CHATGPT:
+Kısa ve Net Karar
+✅ Basit <input type="file"> + hafif drag-&-drop desteği (kendin yaz)
+❌ react-dropzone kullanma
+❌ Komple custom component’e girme
+Yani:
+UX yeterli
+Kod basit
+Savunması güçlü
+En İyi Çözüm: Hybrid Yaklaşım (Altın Orta)
+Native input + hafif drag & drop (kendin)
+Nasıl?
+Arka planda <input type="file">
+Üstte Tailwind ile:
+“PDF’yi buraya sürükle veya tıkla”
+onDrop, onDragOver 10–15 satır JS
+UX:
+Kullanıcı isterse sürükler
+İsterse tıklar
+Sen ekstra kütüphane eklemezsin
+Sonuç
+Bu proje için en iyi UX,
+en az kütüphane,
+en net savunma:
+Native file input + hafif custom drag & drop
+
+COPILOT:
+En iyi UX: Drag & drop (ör. react-dropzone) + görünür, tıklanabilir input fallback.
+Neden: hem sürükle-bırak rahatlığını hem de mobil/klavye için güvenli tıklama deneyimini sunar.UX tavsiyeleri (kısa checklist) 🧭
+✅ Kombine et: react-dropzone + tıklanabilir alan (veya görünür input)
+✅ Açık affordance: "Dosyayı sürükleyin veya tıklayıp seçin" metni + ikonlar
+✅ Dosya doğrulama: MIME tip (application/pdf) ve boyut limiti göster ve bloke et
+✅ Yükleme göstergesi: progress bar / yüzde + durum mesajları (başarılı/başarısız)
+✅ Önizleme: küçük PDF önizlemesi (ör. react-pdf) veya doküman metadata'sı göster
+✅ Mobil uyumluluk: sürükle-bırak desteklenmiyorsa net "Dosya seç" butonu olsun
+✅ Erişilebilirlik (a11y): keyboard focus, aria-label/role, ekran okuyucu mesajları
+✅ Fallbacks: JS yoksa basit input ile çalışsın; hata durumları için kullanıcıya rehberlik verin
+Not: Mobilde sürükle-bırak genelde kullanılmaz — bu yüzden tıklama/seçme alternatifini her zaman sağlamalısınız.
+
+Kapanış — hızlı öneri 🎯
+Yeni başlayan veya MVP için: react-dropzone + tıklanabilir fallback kur; erişilebilirlik ve progress ile tamamla.
+İstersen, sana örnek bir Upload bileşeni (React + Tailwind + React Query upload mutation + progress) oluşturayım 
+
+
+SORU:
+Arama kutusu için:
+- Her tuş vuruşunda arama (debouncing ile)
+- Enter tuşuna basınca arama
+- Arama butonu ile
+
+Hangisi daha iyi kullanıcı deneyimi?
+
+
+
+GEMINI:
+Bu proje için en iyi deneyim: Enter tuşu + Arama Butonu (Hybrid).
+
+  Neden?
+
+   1. Backend Performansı: Sizin sisteminiz arka planda TF-IDF veya
+      Vektör Arama (AI) yapacak. Bu işlemler standart veritabanı
+      sorgusundan daha ağırdır. Debouncing (her tuş vuruşu) ile
+      backend'i gereksiz yere yormak istemeyiz (Örneğin kullanıcı
+      "Machine" yazarken 5 kere istek atılmasını istemeyiz).
+   2. Kullanıcı Niyeti: Akademik aramalarda kullanıcılar genelde
+      sorguyu kafalarında bitirir ve sonra ararlar ("Machine
+      learning in medicine" gibi).
+
+CHATGPT:
+Kısa Cevap (Net Karar)
+
+✅ Enter tuşuna basınca arama + opsiyonel Arama butonu
+❌ Her tuşta arama (debounce olsa bile) kullanma
+
+Bu proje için en iyi UX = bilinçli ve kontrollü arama.
+Önerilen UX Pattern (Altın Standart)
+[ Arama kutusu ]   [ Ara ]
+      ↑
+   Enter ile arama
+Placeholder: “Anahtar kelime girin ve Enter’a basın”
+Loading göstergesi
+Sonuç yoksa açıklayıcı mesaj
+Sonuç
+
+Bu proje için:
+
+Akademik arama davranışı
+
+Kontrollü backend kullanımı
+
+Tahmin edilebilir UX
+
+➡️ Enter + Arama butonu en doğru tercih.
+
+COPILOT:
+En iyi UX: Debounce ile canlı arama (ör. 300ms) + Enter tuşu ile anında arama + görünür bir Arama butonu.
+Neden: hem anlık geri bildirim sağlar hem de kullanıcıya kontrol (Enter/Buton) sunar; mobil ve erişilebilirlik için buton şart.Hızlı kod-snippet (örnek fikir)
+Use useDebounce ya da setTimeout pattern for input; on Enter or button click call search() immediately (flush).
+
+
+soru:
+AI cevap üretirken (2-5 saniye) kullanıcıya ne göstermeliyim?
+- Loading spinner
+- Skeleton screen
+- "Thinking..." animasyonu
+- Progress bar
+
+En iyi UX yaklaşımı nedir?
+
+
+GEMINI:
+Bu senaryo (AI cevabı, metin üretimi, 2-5 saniye) için en iyi UX
+  yaklaşımı: "Thinking..." Animasyonu (Pulsing/Typing Indicator).
+
+  Neden?
+
+   1. Skeleton Screen (İskelet Ekran): Genellikle yapısı bilinen
+      veriler (bir tablo satırı, bir profil kartı) için harikadır.
+      Ancak AI cevabının 1 cümle mi yoksa 5 paragraf mı olacağını
+      bilemeyiz. Yanlış boyutta bir iskelet göstermek (örneğin 5
+      satırlık yer ayırıp 1 satır cevap gelmesi) görsel bir hayal
+      kırıklığı yaratır.
+   2. Spinner: "Veri indiriliyor" hissi verir, "Zeka çalışıyor"
+      hissi vermez. Klasik bir veritabanı sorgusu gibi hissettirir.
+   3. Progress Bar: Backend yüzdelik bilgi vermiyorsa (ki AI
+      modelleri genellikle vermez), "Indeterminate" (sürekli dönen)
+      bir bar kullanmak gerekir. Bu da Spinner ile aynı etkiyi
+      yaratır.
+
+  Önerim: "Thinking..." + Hafif Animasyon
+
+  Kullanıcıya sistemin "düşündüğünü" hissettirmek en modern
+  yaklaşımdır (ChatGPT, Gemini vb. hepsi bunu yapar).
+
+  Uygulamada şöyle yapacağız:
+  MUI kullanarak, cevap alanının hemen üzerinde hafifçe yanıp sönen
+  (pulse) bir ikon (örneğin AutoAwesome ikonu) ve yanında "Analiz
+  ediliyor..." yazısı göstereceğiz.
+
+
+CHATGPT:
+Kısa ve Net Karar
+
+✅ “Thinking…” (metinsel + hafif animasyon) + küçük spinner
+❌ Progress bar
+❌ Skeleton screen (AI cevapları için)
+
+Yani:
+
+Belirsiz süreyi dürüstçe anlat
+“Thinking…” + hafif animasyon → EN DOĞRU
+
+Neden?
+
+AI’nin düşünme metaforuna uygun
+
+Süre belirsizliğini dürüstçe yansıtır
+
+Kullanıcıyı sakin tutar
+
+Akademik projeye çok yakışır
+
+En iyi kombinasyon:
+
+Metin: AI yanıtı hazırlanıyor…
+
+Altında küçük spinner veya nokta animasyonu
+
+🤖 AI yanıtı hazırlanıyor…
+• • •
+
+
+Bu çok güçlü UX sinyali.
+
+3️⃣ Önerilen UX Pattern (Altın Standart)
+┌────────────────────────────┐
+│ 🤖 AI yanıtı hazırlanıyor… │
+│   Kaynaklar taranıyor      │
+│   • • •                    │
+└────────────────────────────┘
+
+
+İstersen:
+
+2. satırı dinamik yapabilirsin:
+
+“Dokümanlar analiz ediliyor”
+
+“İlgili bölümler bulunuyor”
+
+Ama abartma.
+
+
+COPILOT:
+En iyi yaklaşım: Skeleton screen + küçük “assistant typing” animasyonu (nokta animasyonu) + streaming (token/partial) çıktı.
+
+Neden: Skeleton yapının ve yerleşimin ne geleceğini gösterir (algılanan hız artar), typing animasyonu “aktif çalışıyor” hissi verir; streaming varsa kullanıcı hemen içerik görür.
+UX kuralları & uygulanabilir ipuçları 🧭
+✨ Hemen gösterin: 0.1–0.3s içinde skeleton veya typing görünsün (aksi halde kullanıcı kararsız kalır).
+⚡ Kademeli içerik: Mümkünse streaming ile ilk cümleyi anında gösterin.
+♿ Erişilebilirlik: Güncellemeleri ekran okuyuculara iletmek için aria-live="polite" kullanın.
+✋ Kontrol verin: Kullanıcıya "Durdur" / "İptal" seçeneği sunun.
+🔁 Fallback: 5–8 saniyede hala bekleme varsa “Hâlâ yanıt hazırlanıyor — devam etsin mi?” gibi bilgilendirici mesaj gösterin.
+🖼️ Layout stabilitesi: Skeleton, son içeriğin boyutuna yakın olsun — layout shift’i engelleyin.
+📱 Mobil uyumluluk: Hafif animasyonlar tercih edin; pil/CPU etkisini azaltın.
+🔍 A/B test: Kullanıcı davranışına göre skeleton vs. typing kombinasyonunu test edin.
+Kısa uygulama fikri (React + Tailwind) 🔧
+Skeleton: div içinde bg-gray-200 rounded animate-pulse — yer tutucu bloklar.
+Typing indicator: avatar yanında 3 nokta animasyonu (CSS keyframes).
+Streaming: SSE/WS veya chunked HTTP ile parça parça append; aria-live ile okunmasını sağlayın.
+Eğer gerçek bir yüzde tahmininiz yoksa indeterminate progress veya pulse kullanın, % göstermek yanıltıcı olur.
+Kapanış 🎯
+2–5 saniyelik gecikmeler için önerim: Skeleton + küçük typing animasyonu; streaming varsa anlık içerik gösterin.
+İstersen örnek bir React bileşeni (skeleton + typing + streaming fallback) oluşturayım
+
+SORU:
+PDF dosya kontrolü için şu kod doğru mu?
+
+if (file.type === 'pdf') {
+  // upload
+}
+
+Doğru mu? Yoksa farklı mı olmalı?
+
+
+GEMINI:
+Hayır, bu kod tam olarak doğru değil ve hata yapmanıza sebep
+  olabilir. İki önemli sorun var:
+
+   1. MIME Type Farklılığı: PDF dosyalarının standart MIME tipi
+      'application/pdf' şeklindedir. Sadece 'pdf' yazarsanız
+      kontrol her zaman false döner.
+   2. Uzantı vs MIME Type: Bazı durumlarda tarayıcı MIME tipini
+      doğru algılayamayabilir.
+
+  Doğru Yaklaşım:
+
+  Hem MIME tipini hem de dosya uzantısını kontrol etmek en güvenli
+  yoldur:
+
+    1 const isPDF = (file) => {
+    2   // 1. MIME Type kontrolü (Standart: application/pdf)
+    3   const isPdfMime = file.type === 'application/pdf';
+    4   
+    5   // 2. Uzantı kontrolü (Dosya adının sonu .pdf mi?)
+    6   const isPdfExtension = file.name.toLowerCase().endsWith(
+      '.pdf');
+    7 
+    8   return isPdfMime || isPdfExtension;
+    9 };
+   10 
+   11 if (isPDF(file)) {
+   12   // upload
+   13 } else {
+   14   alert("Lütfen sadece PDF dosyası yükleyin.");
+   15 }
+
+  Ancak biz projemizde `react-dropzone` kullanacağımız için, bu
+  kontrolü kütüphane seviyesinde çok daha temiz bir şekilde
+  yapacağız:
+
+   1 const { getRootProps, getInputProps } = useDropzone({
+   2   accept: {
+   3     'application/pdf': ['.pdf'] // Sadece PDF kabul et
+   4   },
+   5   multiple: false // Aynı anda tek dosya
+   6 });
+
+  Bu yöntemle, kullanıcı dosya seçerken PDF olmayan dosyalar zaten
+  "devre dışı" (greyed out) görünecektir.
+
+CHATGPT:
+Sonuç
+
+❌ Yanlış:
+
+file.type === 'pdf'
+
+
+✅ Doğru yaklaşım:
+
+Frontend → çoklu kontrol
+
+Backend → gerçek doğrulama
+Frontend’de doğru yaklaşım (ÖNERİLEN)
+
+Frontend sadece ilk filtreyi yapmalı.
+
+✅ 1. MIME type kontrolü
+file.type === 'application/pdf'
+
+✅ 2. Dosya uzantısı kontrolü
+file.name.toLowerCase().endsWith('.pdf')
+
+✅ 3. Dosya boyutu kontrolü
+file.size < 10 * 1024 * 1024 // örn. 10MB
+
+🔥 Birlikte kullan:
+const isPdf =
+  file.type === 'application/pdf' &&
+  file.name.toLowerCase().endsWith('.pdf') &&
+  file.size < 10 * 1024 * 1024;
+
+if (!isPdf) {
+  alert("Lütfen geçerli bir PDF dosyası yükleyin.");
+  return;
+}
+
+4️⃣ Asıl güvenlik nerede?
+
+⚠️ Asıl doğrulama backend’de yapılır
+
+
+COPILOT:
+Hayır — file.type === 'pdf' yanlış. Tarayıcı file.type için genellikle 'application/pdf' döner (veya bazen boş/başka bir değer).
+En iyi uygulama: file.type kontrolü + dosya adı uzantısı kontrolü + (isteğe bağlı) magic-bytes doğrulaması. Sunucuda kesin doğrulamayı mutlaka yapın.
+Neden?
+file.type MIME türü döner (ör. application/pdf), 'pdf' değil.
+Bazı durumlarda file.type boş olabilir veya application/octet-stream gelebilir — bu yüzden uzantı veya içeriğe bakmak yardımcı olur.
+Güvenlik için her zaman sunucu tarafında da doğrulama yapın (mime + içeriğin PDF magic bytes: %PDF-).
+
+
+
+
+SORU:
+React'te API çağrısı için şu kod doğru mu?
+
+useEffect(async () => {
+  const data = await fetch('/api/documents');
+}, []);
+
+Bu kullanım doğru mu?
+
+
+GEMINI:
+Hayır, bu kullanım teknik olarak yanlıştır ve React konsolda
+  hata/uyarı verir.
+
+  Neden Yanlış?
+  useEffect fonksiyonu ya hiçbir şey (undefined) ya da bir cleanup
+  fonksiyonu döndürmelidir.
+  async fonksiyonlar ise her zaman bir `Promise` döndürür. React bu
+  Promise'i nasıl temizleyeceğini (cleanup) bilemez.
+
+  1. Doğru Kullanım (Native React)
+  Async fonksiyonu useEffect'in içinde tanımlayıp çağırmanız
+  gerekir:
+
+    1 useEffect(() => {
+    2   // Fonksiyonu içeride tanımla
+    3   const fetchData = async () => {
+    4     try {
+    5       const response = await fetch('/api/documents');
+    6       const data = await response.json();
+    7       // setData(data);
+    8     } catch (error) {
+    9       console.error(error);
+   10     }
+   11   };
+   12 
+   13   // Sonra çağır
+   14   fetchData();
+   15 }, []);
+
+  2. Bizim Kullanacağımız Yöntem (React Query)
+  Biz projede React Query kullanmaya karar verdiğimiz için
+  useEffect yazmanıza gerek kalmayacak. Kodunuz şu kadar temiz
+  olacak:
+
+   1 // Component içinde
+   2 const { data, isLoading } = useQuery({
+   3   queryKey: ['documents'],
+   4   queryFn: () => axios.get('/api/documents').then(res => res.
+     data)
+   5 });
+
+  Bu yöntem hem daha kısa hem de arka planda loading, error ve
+  caching mekanizmalarını otomatik yönetir.
+
+
+CHATGPT:
+Kısa cevap: ❌ Hayır, bu kullanım doğru değil.
+Ama bu hatayı anlamak React + async mantığını gerçekten bildiğini gösterir.
+
+1️⃣ Neden yanlış?
+useEffect(async () => {
+  const data = await fetch('/api/documents');
+}, []);
+
+❌ Sorun ne?
+
+useEffect callback’i async olamaz
+
+Çünkü useEffect:
+
+ya undefined
+
+ya da cleanup function
+döndürmelidir
+
+async fonksiyon ise Promise döndürür.
+Doğru kullanım (ÖNERİLEN)
+✅ Çözüm: İçeride async fonksiyon tanımla
+useEffect(() => {
+  const fetchDocuments = async () => {
+    const res = await fetch('/api/documents');
+    const data = await res.json();
+    setDocuments(data);
+  };
+
+  fetchDocuments();
+}, []);
+
+
+Bu React’in resmi önerdiği kullanım.
+
+COPILOT:
+Hayır — useEffect(async () => { ... }, []) yanlış kullanımdır.
+React, effect callback'inin ya cleanup fonksiyonu ya da undefined döndürmesini bekler; async fonksiyonlar Promise döndüğü için bu karışıklığa neden olur.
+Doğru yaklaşımlar (kısa ve uygulanabilir) 🔧
+Basit ve okunaklı (async fonksiyon içte):
+Tavsiye edilen (daha yüksek seviye): React Query kullanın — cache, re-fetch, cancel, loading state gibi işler otomatik:
+const { data, error, isLoading } = useQuery('documents', async () => {
+  const res = await fetch('/api/documents');
+  if (!res.ok) throw new Error('Network error');
+  return res.json();
+});
+
+
+
+
+SORU:
+FormData ile dosya gönderirken fetch içinde şöyle yapmalı mıyım?
+
+fetch('/upload', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  },
+  body: formData
+})
+
+Bu doğru mu?
+
+
+GEMINI:
+Hayır, bu çok yaygın yapılan bir hatadır.
+
+  Neden Yanlış?
+  FormData kullandığınızda, tarayıcının HTTP isteğine otomatik
+  olarak bir "boundary" (sınır belirleyici) eklemesi gerekir. Bu
+  boundary, sunucuya dosyanın nerede başlayıp nerede bittiğini
+  söyler.
+
+  Eğer manuel olarak 'Content-Type': 'multipart/form-data'
+  yazarsanız, bu boundary eklenmez ve sunucu (FastAPI/Python) gelen
+  dosyayı ayrıştıramaz (Genellikle "Invalid boundary" veya "Missing
+  boundary" hatası alırsınız).
+
+  Doğru Kullanım (Fetch):
+  Headers kısmını boş bırakmalısınız. Tarayıcı, body'nin bir
+  FormData nesnesi olduğunu görünce doğru header'ı ve boundary'yi
+  kendisi ekler.
+
+   1 fetch('/upload', {
+   2   method: 'POST',
+   3   // headers: { ... }, // BURAYI SİLMELİSİNİZ!
+   4   body: formData
+   5 })
+
+  Bizim Kullanacağımız Yöntem (Axios):
+  Daha önce kararlaştırdığımız gibi Axios kullanacağız. Axios bu
+  durumu daha da şeffaf yönetir:
+
+    1 import axios from 'axios';
+    2 
+    3 const uploadFile = async (file) => {
+    4   const formData = new FormData();
+    5   formData.append('file', file);
+    6 
+    7   return await axios.post('/api/v1/documents/upload', formDat
+      {
+    8     onUploadProgress: (progressEvent) => {
+    9       // Yüzdelik ilerlemeyi burada yakalayacağız! (UX için 
+      harika)
+   10       const percentCompleted = Math.round((progressEvent.load
+      * 100) / progressEvent.total);
+   11       console.log(`Yükleniyor: %${percentCompleted}`);
+   12     }
+   13   });
+   14 };
+
+CHATGPT:
+Kısa cevap: ❌ Hayır, bu doğru değil.
+Bu, dosya upload’ta yapılan en yaygın ama kritik hatalardan biri.
+
+1️⃣ Neden yanlış?
+headers: {
+  'Content-Type': 'multipart/form-data'
+}
+
+
+Bunu manuel set etmemelisin.
+
+Sebep:
+
+multipart/form-data boundary içerir:
+
+multipart/form-data; boundary=----WebKitFormBoundaryX...
+Doğru kullanım (ÖNERİLEN)
+✅ Content-Type’ı HİÇ yazma
+fetch('/upload', {
+  method: 'POST',
+  body: formData
+});
+
+
+Tarayıcı:
+
+Content-Type
+
+boundary
+
+Content-Length
+
+hepsini kendisi ayarlar.
+
+
+COPILOT:
+Hayır — doğru değil. Content-Type: 'multipart/form-data''ı elle ayarlamayın; tarayıcı FormData için gereken boundary bilgisini otomatik ekler. Elle ayarlarsanız boundary eksik olur ve sunucu isteği reddeder.
+Doğru kullanım 🔧
+Basit ve doğru:
+const formData = new FormData();
+formData.append('file', file, file.name);
+
+fetch('/upload', {
+  method: 'POST',
+  body: formData, // no Content-Type header
+});
+Header eklemeniz gerekiyorsa (örn. Authorization) sadece onu ekleyin:
+fetch('/upload', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+  body: formData,
+});
+Ek ipuçları & dikkat edilmesi gerekenler 🧭
+⚠️ Upload progress: fetch ile upload progress (onUploadProgress) kolay değil; gerçek zamanlı progress için XMLHttpRequest veya axios (XHR tabanlı) kullanın.
+🔒 Sunucu doğrulaması: mutlaka sunucuda MIME/uzantı/magic-bytes ve boyut kontrolü yapın.
+🌐 CORS / credentials: eğer cookie/credentials gerekiyorsa credentials: 'include' ekleyin ve sunucunun CORS ayarlarını yapılandırın.
+Node ortamı (server-side fetch) veya FormData polyfill kullanıyorsanız, bazı paketler için header'ları form.getHeaders() ile almak gerekebilir.
+
