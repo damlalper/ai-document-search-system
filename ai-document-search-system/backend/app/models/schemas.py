@@ -48,6 +48,42 @@ class SearchResult(BaseModel):
     snippet: str  # Text excerpt from document
 
 
+# ============ AI Models ============
+
+class SummarizeRequest(BaseModel):
+    """Request for document summarization"""
+    doc_id: str
+    summary_type: str = Field(default="short", pattern="^(short|detailed)$", description="Type of summary")
+
+
+class SummarizeResponse(BaseModel):
+    """Response for document summarization"""
+    doc_id: str
+    summary_type: str
+    summary: str
+
+
+class QARequest(BaseModel):
+    """Request for question answering (RAG)"""
+    question: str = Field(..., min_length=1, description="User question")
+    doc_ids: Optional[List[str]] = Field(default=None, description="Optional filter: specific doc IDs to search")
+
+
+class QASource(BaseModel):
+    """Source document for Q&A answer"""
+    doc_id: str
+    filename: str
+    relevance_score: float
+    excerpt: str = Field(description="Text excerpt from document (Copilot's idea)")
+
+
+class QAResponse(BaseModel):
+    """Response for question answering"""
+    question: str
+    answer: str
+    sources: List[QASource]
+
+
 class SearchResponse(BaseModel):
     """Response for search query"""
     query: str

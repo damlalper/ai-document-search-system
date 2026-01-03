@@ -8,9 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
 from app.config import settings
-from app.routers import documents, search
+from app.routers import documents, search, ai
 from app.services.search_service import search_service
-# from app.routers import ai  # AI router will be implemented later
 
 
 # Create necessary directories on startup
@@ -80,4 +79,4 @@ async def health_check():
 # Register routers
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
 app.include_router(search.router, prefix="/api/v1", tags=["search"])
-# app.include_router(ai.router, prefix="/api/v1", tags=["ai"])  # AI router will be implemented later
+app.include_router(ai.router, prefix="/api/v1", tags=["ai"])
