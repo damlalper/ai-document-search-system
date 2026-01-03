@@ -45,19 +45,19 @@ async def startup_event():
     # Load existing documents into search index
     try:
         search_service.load_documents()
-        print(f"✅ Search index loaded with {len(search_service.doc_ids)} documents")
+        print(f"[OK] Search index loaded with {len(search_service.doc_ids)} documents")
     except Exception as e:
-        print(f"⚠️  Warning: Failed to load search index: {str(e)}")
+        print(f"[WARNING] Failed to load search index: {str(e)}")
 
-    print(f"🚀 {settings.app_name} v{settings.app_version} started")
-    print(f"📁 Upload directory: {settings.upload_dir}")
-    print(f"📄 Extracted text directory: {settings.extracted_dir}")
+    print(f"[START] {settings.app_name} v{settings.app_version} started")
+    print(f"[INFO] Upload directory: {settings.upload_dir}")
+    print(f"[INFO] Extracted text directory: {settings.extracted_dir}")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Run on application shutdown"""
-    print(f"🛑 {settings.app_name} shutting down")
+    print(f"[STOP] {settings.app_name} shutting down")
 
 
 @app.get("/")
