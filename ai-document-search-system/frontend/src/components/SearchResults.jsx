@@ -2,7 +2,26 @@
 // Sources clearly separated, readable excerpts, clean card layout
 // Academic Minimalism: supports explainability and trust
 
+import { useState } from 'react';
+import { summarizeDocument } from '../services/api';
+
 const SearchResults = ({ results, query }) => {
+  const [summaryLoading, setSummaryLoading] = useState({});
+  const [summaries, setSummaries] = useState({});
+
+  const handleSummarize = async (docId) => {
+    setSummaryLoading((prev) => ({ ...prev, [docId]: true }));
+    try {
+      const response = await summarizeDocument(docId, 'short');
+      setSummaries((prev) => ({ ...prev, [docId]: response.summary }));
+    } catch (error) {
+      console.error('Summarization failed:', error);
+      alert('Failed to generate summary. Please try again.');
+    } finally {
+      setSummaryLoading((prev) => ({ ...prev, [docId]: false }));
+    }
+  };
+
   if (!results || results.length === 0) {
     return (
       <div className="text-center py-16">
@@ -54,13 +73,32 @@ const SearchResults = ({ results, query }) => {
               {result.snippet}
             </p>
 
+            {/* Summary Display */}
+            {summaries[result.doc_id] && (
+              <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+                <p className="text-xs font-semibold text-teal-900 mb-1">AI Summary:</p>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {summaries[result.doc_id]}
+                </p>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="mt-4 pt-4 border-t border-slate-100 flex items-center space-x-4 text-sm">
-              <button className="font-medium text-teal-700 hover:text-teal-900 transition-colors">
+              <a
+                href={`http://localhost:8000/api/v1/documents/${result.doc_id}/download`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-teal-700 hover:text-teal-900 transition-colors"
+              >
                 View Document
-              </button>
-              <button className="text-slate-600 hover:text-slate-900 transition-colors">
-                Summarize
+              </a>
+              <button
+                onClick={() => handleSummarize(result.doc_id)}
+                disabled={summaryLoading[result.doc_id]}
+                className="text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {summaryLoading[result.doc_id] ? 'Summarizing...' : 'Summarize'}
               </button>
             </div>
           </div>
