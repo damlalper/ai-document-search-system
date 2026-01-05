@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     tfidf_max_features: int = 1000
 
     # LLM Settings
-    default_model: str = "llama3-8b-8192"
+    default_model: str = "llama-3.1-8b-instant"  # Updated from decommissioned llama3-8b-8192
     max_tokens: int = 1024
     temperature: float = 0.7
 

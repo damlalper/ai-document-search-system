@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from app.config import settings
 from app.models.schemas import DocumentUploadResponse, DocumentListResponse, DocumentInfo
@@ -180,6 +180,43 @@ async def get_document(doc_id: str):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Document with ID {doc_id} not found"
+    )
+
+
+@router.get("/documents/{doc_id}/download")
+async def download_document(doc_id: str):
+    """
+    Download the original PDF file
+    """
+    metadata = load_metadata()
+    documents = metadata.get('documents', [])
+
+    # Find document by ID
+    doc_found = None
+    for doc in documents:
+        if doc['doc_id'] == doc_id:
+            doc_found = doc
+            break
+
+    if not doc_found:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document with ID {doc_id} not found"
+        )
+
+    # Check if PDF file exists
+    pdf_path = settings.upload_dir / f"{doc_id}.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"PDF file not found for document {doc_id}"
+        )
+
+    # Return file for download
+    return FileResponse(
+        path=pdf_path,
+        media_type='application/pdf',
+        filename=doc_found['filename']
     )
 
 
