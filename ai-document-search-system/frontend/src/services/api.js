@@ -9,7 +9,7 @@ import {
 } from '../data/mockData';
 
 // Toggle between mock and real API
-const USE_MOCK_DATA = true; // Set to false when backend is ready
+const USE_MOCK_DATA = false; // Backend is ready - using real API
 
 const API_BASE_URL = 'http://localhost:8000/api/v1';
 

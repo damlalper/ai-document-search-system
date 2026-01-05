@@ -74,8 +74,15 @@ function App() {
                 Search
               </button>
               <button
-                onClick={() => setShowThinking(!showThinking)}
-                className="py-3 px-1 border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300 font-medium text-sm transition-colors"
+                onClick={() => setActiveTab('test-ai')}
+                className={`
+                  py-3 px-1 border-b-2 font-medium text-sm transition-colors
+                  ${
+                    activeTab === 'test-ai'
+                      ? 'border-teal-700 text-teal-700'
+                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                  }
+                `}
               >
                 Test AI Loader
               </button>
@@ -129,9 +136,16 @@ function App() {
           )}
 
           {/* Test ThinkingLoader */}
-          {showThinking && (
-            <div className="mt-8 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
-              <ThinkingLoader message="Analyzing your documents..." />
+          {activeTab === 'test-ai' && (
+            <div className="space-y-8">
+              <section>
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">
+                  Test AI Loading States
+                </h2>
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
+                  <ThinkingLoader message="Analyzing your documents..." />
+                </div>
+              </section>
             </div>
           )}
         </main>
