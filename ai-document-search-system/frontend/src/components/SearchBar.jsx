@@ -1,5 +1,6 @@
 // SearchBar Component
-// Enter + Button search (NO debouncing as per AI decision)
+// Minimal input, strong focus state, keyboard-first (Enter supported)
+// Academic Minimalism: clean, functional, no distractions
 
 import { useState } from 'react';
 
@@ -14,8 +15,8 @@ const SearchBar = ({ onSearch, loading = false }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
+      <div className="flex gap-3">
         <div className="relative flex-1">
           <input
             type="text"
@@ -23,18 +24,18 @@ const SearchBar = ({ onSearch, loading = false }) => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Enter keyword and press Enter..."
             disabled={loading}
-            className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 pr-11 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent disabled:bg-slate-100 disabled:cursor-not-allowed transition-shadow"
           />
           <svg
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+            className="absolute right-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            strokeWidth={2}
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
@@ -43,12 +44,12 @@ const SearchBar = ({ onSearch, loading = false }) => {
         <button
           type="submit"
           disabled={!query.trim() || loading}
-          className="px-6 py-3 bg-teal-700 text-white font-medium rounded-lg hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="px-6 py-3 bg-teal-700 text-white font-medium rounded-lg hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? (
-            <span className="flex items-center">
+            <span className="flex items-center gap-2">
               <svg
-                className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                className="animate-spin h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -75,7 +76,7 @@ const SearchBar = ({ onSearch, loading = false }) => {
         </button>
       </div>
 
-      <p className="mt-2 text-sm text-gray-500 text-center">
+      <p className="mt-3 text-sm text-slate-500 text-center">
         Press Enter or click Search button to search documents
       </p>
     </form>

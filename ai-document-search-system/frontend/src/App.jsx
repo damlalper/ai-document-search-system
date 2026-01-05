@@ -8,7 +8,7 @@ import ThinkingLoader from './components/ThinkingLoader';
 import { searchDocuments } from './services/api';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('documents'); // documents | search
+  const [activeTab, setActiveTab] = useState('documents');
   const [searchResults, setSearchResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,31 +30,31 @@ function App() {
 
   return (
     <DocumentProvider>
-      <div className="min-h-screen bg-amber-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 className="text-2xl font-bold text-gray-900">
+      <div className="min-h-screen bg-slate-50">
+        {/* Simple Header - text-based, clean */}
+        <header className="bg-white border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 className="text-2xl font-semibold text-slate-900">
               AI Document Search System
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-slate-600">
               Upload, search, and analyze documents with AI
             </p>
           </div>
         </header>
 
-        {/* Navigation Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <div className="border-b border-amber-100">
+        {/* Navigation Tabs - minimal, clear */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+          <div className="border-b border-slate-200">
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('documents')}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  py-3 px-1 border-b-2 font-medium text-sm transition-colors
                   ${
                     activeTab === 'documents'
-                      ? 'border-teal-700 text-teal-800'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-teal-700 text-teal-700'
+                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                   }
                 `}
               >
@@ -63,11 +63,11 @@ function App() {
               <button
                 onClick={() => setActiveTab('search')}
                 className={`
-                  py-4 px-1 border-b-2 font-medium text-sm
+                  py-3 px-1 border-b-2 font-medium text-sm transition-colors
                   ${
                     activeTab === 'search'
-                      ? 'border-teal-700 text-teal-800'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-teal-700 text-teal-700'
+                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                   }
                 `}
               >
@@ -75,7 +75,7 @@ function App() {
               </button>
               <button
                 onClick={() => setShowThinking(!showThinking)}
-                className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm"
+                className="py-3 px-1 border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300 font-medium text-sm transition-colors"
               >
                 Test AI Loader
               </button>
@@ -83,13 +83,13 @@ function App() {
           </div>
         </div>
 
-        {/* Main Content */}
+        {/* Main Content - vertical flow, generous spacing */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {activeTab === 'documents' && (
-            <div className="space-y-4 sm:space-y-6 xl:space-y-8">
+            <div className="space-y-8">
               {/* Upload Section */}
               <section>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">
                   Upload Document
                 </h2>
                 <FileUpload />
@@ -103,19 +103,20 @@ function App() {
           )}
 
           {activeTab === 'search' && (
-            <div className="space-y-4 sm:space-y-6 xl:space-y-8">
+            <div className="space-y-8">
               {/* Search Bar */}
               <section>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">
                   Search Documents
                 </h2>
                 <SearchBar onSearch={handleSearch} loading={searching} />
               </section>
 
-              {/* Search Results */}
+              {/* Search Results - AI output with clear loading */}
               {searching && (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-teal-700"></div>
+                  <p className="mt-4 text-sm text-slate-600">Searching documents...</p>
                 </div>
               )}
 
@@ -129,16 +130,16 @@ function App() {
 
           {/* Test ThinkingLoader */}
           {showThinking && (
-            <div className="mt-8 bg-white rounded-lg shadow p-6">
+            <div className="mt-8 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
               <ThinkingLoader message="Analyzing your documents..." />
             </div>
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="mt-12 bg-white border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <p className="text-center text-sm text-gray-500">
+        {/* Footer - simple, unobtrusive */}
+        <footer className="mt-16 bg-white border-t border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p className="text-center text-sm text-slate-500">
               BİL440 Final Project - AI-Augmented Software Development
             </p>
           </div>

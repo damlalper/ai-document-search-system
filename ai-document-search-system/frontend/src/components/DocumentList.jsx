@@ -1,5 +1,6 @@
 // DocumentList Component
-// Displays uploaded documents with delete functionality
+// Clean card layout with visible borders, gentle shadows, rounded-xl
+// Academic Minimalism: clear separation, readable text, soft hierarchy
 
 import { useState } from 'react';
 import { useDocuments } from '../context/DocumentContext';
@@ -42,38 +43,39 @@ const DocumentList = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-teal-700"></div>
+        <p className="mt-4 text-sm text-slate-600">Loading documents...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-        <p className="text-red-800">Error loading documents: {error}</p>
+      <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+        <p className="text-sm text-red-800">Error loading documents: {error}</p>
       </div>
     );
   }
 
   if (documents.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-16">
         <svg
-          className="mx-auto h-16 w-16 text-gray-400"
+          className="mx-auto h-14 w-14 text-slate-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          strokeWidth={1.5}
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <h3 className="mt-4 text-lg font-medium text-gray-900">No documents yet</h3>
-        <p className="mt-2 text-sm text-gray-500">
+        <h3 className="mt-4 text-base font-medium text-slate-900">No documents yet</h3>
+        <p className="mt-2 text-sm text-slate-600">
           Upload a PDF document to get started
         </p>
       </div>
@@ -81,16 +83,16 @@ const DocumentList = () => {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">
+    <div className="space-y-5">
+      <h2 className="text-lg font-semibold text-slate-900">
         Your Documents ({documents.length})
       </h2>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {documents.map((doc) => (
           <div
             key={doc.doc_id}
-            className="border border-amber-100 rounded-lg p-4 hover:border-teal-200 hover:shadow-md transition-all duration-200"
+            className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
           >
             {/* File Icon & Name */}
             <div className="flex items-start space-x-3">
@@ -108,27 +110,27 @@ const DocumentList = () => {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-slate-900 truncate leading-relaxed">
                   {doc.filename}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {formatDate(doc.uploaded_at)}
                 </p>
               </div>
             </div>
 
             {/* Document Info */}
-            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <div className="mt-4 flex items-center justify-between text-xs text-slate-600">
               <span>{doc.page_count || 0} pages</span>
               <span>{formatFileSize(doc.file_size || 0)}</span>
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex space-x-2">
+            <div className="mt-4 pt-4 border-t border-slate-100">
               <button
                 onClick={() => handleDelete(doc.doc_id, doc.filename)}
                 disabled={deletingId === doc.doc_id}
-                className="flex-1 px-3 py-2 text-sm font-medium text-red-700 bg-red-50 rounded-md hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 text-sm font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {deletingId === doc.doc_id ? 'Deleting...' : 'Delete'}
               </button>
