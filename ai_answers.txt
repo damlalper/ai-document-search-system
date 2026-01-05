@@ -2247,3 +2247,162 @@ Sans (tavsiye, modern ve okunaklı): Inter (variable), IBM Plex Sans, Roboto
 Serif (akademik hissi): Source Serif 4, Merriweather, Spectral
 Kapanış & aksiyon ▶️
 İstersen: 1) Seçtiğin fontu projeye entegre edip tailwind.config.js’i güncelleyeyim, veya 2) Inter + Source Serif için bir kısa görsel/micro-UI demo hazırlayayım; hangisini tercih edersin? ✅
+
+
+CHATGPT TASARIM PROMPTU: 
+You are designing the FRONTEND UI of an academic web application.
+
+PROJECT CONTEXT:
+This is a university final project (BIL440 – AI-Augmented Software Lifecycle).
+The interface must be:
+- academically appropriate
+- professional
+- readable for long sessions
+BUT also:
+- visually clean
+- modern
+- confidence-inspiring (not dull)
+
+The goal is NOT decorative beauty,
+but "quiet confidence" similar to:
+Notion, Linear, OpenAI Docs, Vercel Docs, GitHub Docs.
+
+---
+
+## CORE DESIGN PHILOSOPHY
+"Academic Minimalism with Modern Polish"
+
+→ UI should feel calm, structured and trustworthy
+→ Visual design supports cognition, not competes with it
+→ Slight elegance is encouraged, visual noise is not
+
+---
+
+## STRICT CONSTRAINTS
+
+❌ DO NOT:
+- Use Material UI
+- Use glassmorphism
+- Use neon or oversaturated colors
+- Use heavy gradients
+- Use large shadows
+- Add unnecessary animations
+- Design like a marketing landing page
+
+✅ YOU MAY:
+- Use subtle gradients ONLY for background separation
+- Use soft shadows for hierarchy
+- Use modern spacing and rounded corners
+- Create a premium academic feel
+
+---
+
+## TECH STACK (FIXED)
+- React + Vite
+- Tailwind CSS
+- Context API
+- Native fetch()
+
+---
+
+## COLOR PALETTE (REFINED)
+
+Background:
+- Light neutral (not pure white)
+  - e.g. slate-50 / zinc-50 / stone-50
+
+Primary Accent:
+- Deep teal or muted blue
+  - e.g. teal-700 / blue-700
+
+Secondary Accent:
+- Soft cyan or muted sky
+  - e.g. sky-600 (limited use)
+
+Text:
+- Primary: slate-900
+- Secondary: slate-600
+
+Borders:
+- Default: subtle neutral
+- Hover: accent-tinted border
+
+Contrast must be sufficient for long reading sessions.
+
+---
+
+## TYPOGRAPHY
+
+Font:
+- Geist Sans (single font)
+
+Rules:
+- Clear typographic hierarchy
+- Comfortable line-height
+- Reading-first sizing
+- No serif fonts
+- No playful fonts
+
+---
+
+## COMPONENT GUIDELINES
+
+### Document Cards
+- Clean card layout
+- Visible but subtle border
+- Gentle shadow on hover
+- Rounded-xl
+- Clear separation between items
+
+### File Upload
+- Clean drag & drop
+- Clear affordance
+- No visual clutter
+
+### Search & Query
+- Minimal input
+- Strong focus state
+- Keyboard-first (Enter supported)
+
+### AI Output
+- Clear loading text
+- Subtle opacity pulse allowed
+- No typing animation
+- No skeleton loaders
+
+### Sources
+- Clearly separated
+- Readable excerpts
+- Supports explainability and trust
+
+---
+
+## PAGE STRUCTURE
+
+Vertical flow:
+1. Simple header (text-based)
+2. Upload
+3. Search / Question
+4. AI result
+5. Sources
+6. Document list
+
+No sidebars unless necessary.
+
+---
+
+## FINAL RULE
+
+If there is a choice between:
+- visually impressive
+- cognitively clear
+
+Always choose clarity.
+
+You are implementing a HUMAN-DEFINED design framework.
+Do not invent additional UI ideas.
+
+OUTPUT:
+- Component-level design explanation
+- Tailwind utility examples
+- Layout reasoning
