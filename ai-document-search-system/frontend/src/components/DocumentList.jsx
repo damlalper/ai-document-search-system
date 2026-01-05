@@ -43,7 +43,7 @@ const DocumentList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
       </div>
     );
   }
@@ -81,7 +81,7 @@ const DocumentList = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <h2 className="text-xl font-semibold text-gray-900">
         Your Documents ({documents.length})
       </h2>
@@ -90,7 +90,7 @@ const DocumentList = () => {
         {documents.map((doc) => (
           <div
             key={doc.doc_id}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="border border-amber-100 rounded-lg p-4 hover:border-teal-200 hover:shadow-md transition-all duration-200"
           >
             {/* File Icon & Name */}
             <div className="flex items-start space-x-3">

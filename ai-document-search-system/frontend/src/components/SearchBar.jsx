@@ -23,7 +23,7 @@ const SearchBar = ({ onSearch, loading = false }) => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Enter keyword and press Enter..."
             disabled={loading}
-            className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           <svg
             className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
@@ -43,7 +43,7 @@ const SearchBar = ({ onSearch, loading = false }) => {
         <button
           type="submit"
           disabled={!query.trim() || loading}
-          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="px-6 py-3 bg-teal-700 text-white font-medium rounded-lg hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? (
             <span className="flex items-center">

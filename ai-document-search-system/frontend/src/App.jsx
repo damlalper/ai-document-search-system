@@ -30,7 +30,7 @@ function App() {
 
   return (
     <DocumentProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-amber-50">
         {/* Header */}
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -45,7 +45,7 @@ function App() {
 
         {/* Navigation Tabs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <div className="border-b border-gray-200">
+          <div className="border-b border-amber-100">
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('documents')}
@@ -53,7 +53,7 @@ function App() {
                   py-4 px-1 border-b-2 font-medium text-sm
                   ${
                     activeTab === 'documents'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-teal-700 text-teal-800'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }
                 `}
@@ -66,7 +66,7 @@ function App() {
                   py-4 px-1 border-b-2 font-medium text-sm
                   ${
                     activeTab === 'search'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-teal-700 text-teal-800'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }
                 `}
@@ -86,7 +86,7 @@ function App() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {activeTab === 'documents' && (
-            <div className="space-y-8">
+            <div className="space-y-4 sm:space-y-6 xl:space-y-8">
               {/* Upload Section */}
               <section>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -103,7 +103,7 @@ function App() {
           )}
 
           {activeTab === 'search' && (
-            <div className="space-y-8">
+            <div className="space-y-4 sm:space-y-6 xl:space-y-8">
               {/* Search Bar */}
               <section>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -115,7 +115,7 @@ function App() {
               {/* Search Results */}
               {searching && (
                 <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
                 </div>
               )}
 

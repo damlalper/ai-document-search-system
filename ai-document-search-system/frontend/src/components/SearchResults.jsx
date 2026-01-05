@@ -27,7 +27,7 @@ const SearchResults = ({ results, query }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <h3 className="text-lg font-semibold text-gray-900">
         Search Results for "{query}" ({results.length})
       </h3>
@@ -36,14 +36,14 @@ const SearchResults = ({ results, query }) => {
         {results.map((result, index) => (
           <div
             key={`${result.doc_id}-${index}`}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="border border-amber-100 rounded-lg p-4 hover:border-teal-200 hover:shadow-md transition-all duration-200"
           >
             {/* Document Name & Score */}
             <div className="flex items-start justify-between">
               <h4 className="text-base font-medium text-gray-900 flex-1">
                 {result.filename}
               </h4>
-              <span className="ml-2 px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded">
+              <span className="ml-2 px-2 py-1 text-xs font-semibold text-teal-800 bg-teal-100 rounded">
                 {(result.score * 100).toFixed(1)}% match
               </span>
             </div>
@@ -55,7 +55,7 @@ const SearchResults = ({ results, query }) => {
 
             {/* Actions */}
             <div className="mt-3 flex items-center space-x-4 text-sm">
-              <button className="text-blue-600 hover:text-blue-800 font-medium">
+              <button className="text-teal-700 hover:text-teal-900 font-medium">
                 View Document
               </button>
               <button className="text-gray-600 hover:text-gray-800">

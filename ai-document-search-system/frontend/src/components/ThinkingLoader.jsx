@@ -6,9 +6,9 @@ const ThinkingLoader = ({ message = 'AI is thinking...' }) => {
     <div className="flex flex-col items-center justify-center py-8">
       {/* Robot/AI Icon */}
       <div className="relative">
-        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
+        <div className="h-16 w-16 rounded-full bg-teal-100 flex items-center justify-center animate-pulse">
           <svg
-            className="h-8 w-8 text-blue-600"
+            className="h-8 w-8 text-teal-700"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -28,13 +28,13 @@ const ThinkingLoader = ({ message = 'AI is thinking...' }) => {
 
       {/* Dot animation */}
       <div className="mt-2 flex space-x-1">
-        <div className="h-2 w-2 bg-blue-600 rounded-full animate-bounce"></div>
+        <div className="h-2 w-2 bg-teal-700 rounded-full animate-bounce"></div>
         <div
-          className="h-2 w-2 bg-blue-600 rounded-full animate-bounce"
+          className="h-2 w-2 bg-teal-700 rounded-full animate-bounce"
           style={{ animationDelay: '0.1s' }}
         ></div>
         <div
-          className="h-2 w-2 bg-blue-600 rounded-full animate-bounce"
+          className="h-2 w-2 bg-teal-700 rounded-full animate-bounce"
           style={{ animationDelay: '0.2s' }}
         ></div>
       </div>
