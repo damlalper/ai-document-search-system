@@ -21,7 +21,7 @@ from app.models.schemas import (
     SummarizeResponse,
     QARequest,
     QAResponse,
-    QASource
+    Source
 )
 from app.services.llm_service import llm_service
 from app.services.search_service import search_service
@@ -100,7 +100,8 @@ async def summarize_document(request: SummarizeRequest):
         return SummarizeResponse(
             doc_id=request.doc_id,
             summary_type=request.summary_type,
-            summary=summary
+            summary=summary,
+            model_used=settings.default_model
         )
 
     except HTTPException:
@@ -155,7 +156,8 @@ async def answer_question(request: QARequest):
             return QAResponse(
                 question=request.question,
                 answer=NO_ANSWER_TEXT,
-                sources=[]
+                sources=[],
+                model_used="N/A"
             )
 
         # Filter by doc_ids if provided (Claude's filtering logic)
@@ -170,7 +172,8 @@ async def answer_question(request: QARequest):
             return QAResponse(
                 question=request.question,
                 answer=NO_ANSWER_TEXT,
-                sources=[]
+                sources=[],
+                model_used="N/A"
             )
 
         # Load metadata for filenames
@@ -200,10 +203,9 @@ async def answer_question(request: QARequest):
                     filename = meta_map.get(doc_id, {}).get('filename', 'Unknown')
                     excerpt = doc_text[:200] + "..." if len(doc_text) > 200 else doc_text
 
-                    sources.append(QASource(
+                    sources.append(Source(
                         doc_id=doc_id,
                         filename=filename,
-                        relevance_score=result['score'],
                         excerpt=excerpt
                     ))
 
@@ -234,7 +236,8 @@ async def answer_question(request: QARequest):
         return QAResponse(
             question=request.question,
             answer=answer,
-            sources=sources
+            sources=sources,
+            model_used=settings.default_model
         )
 
     except HTTPException:
