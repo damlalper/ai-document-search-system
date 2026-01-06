@@ -4,6 +4,7 @@ import FileUpload from './components/FileUpload';
 import DocumentList from './components/DocumentList';
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
+import QuestionAnswer from './components/QuestionAnswer';
 import ThinkingLoader from './components/ThinkingLoader';
 import { searchDocuments } from './services/api';
 
@@ -12,7 +13,6 @@ function App() {
   const [searchResults, setSearchResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showThinking, setShowThinking] = useState(false);
 
   const handleSearch = async (query) => {
     setSearching(true);
@@ -132,6 +132,14 @@ function App() {
                   <SearchResults results={searchResults} query={searchQuery} />
                 </section>
               )}
+
+              {/* Q&A Section - Natural language question answering */}
+              <section>
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">
+                  Ask Questions About Your Documents
+                </h2>
+                <QuestionAnswer />
+              </section>
             </div>
           )}
 

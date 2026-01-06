@@ -8,12 +8,14 @@ import { summarizeDocument } from '../services/api';
 const SearchResults = ({ results, query }) => {
   const [summaryLoading, setSummaryLoading] = useState({});
   const [summaries, setSummaries] = useState({});
+  const [summaryTypes, setSummaryTypes] = useState({}); // Track summary type per document
 
-  const handleSummarize = async (docId) => {
+  const handleSummarize = async (docId, summaryType = 'short') => {
     setSummaryLoading((prev) => ({ ...prev, [docId]: true }));
     try {
-      const response = await summarizeDocument(docId, 'short');
+      const response = await summarizeDocument(docId, summaryType);
       setSummaries((prev) => ({ ...prev, [docId]: response.summary }));
+      setSummaryTypes((prev) => ({ ...prev, [docId]: summaryType }));
     } catch (error) {
       console.error('Summarization failed:', error);
       alert('Failed to generate summary. Please try again.');
@@ -76,15 +78,25 @@ const SearchResults = ({ results, query }) => {
             {/* Summary Display */}
             {summaries[result.doc_id] && (
               <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
-                <p className="text-xs font-semibold text-teal-900 mb-1">AI Summary:</p>
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-semibold text-teal-900">
+                    AI Summary ({summaryTypes[result.doc_id] === 'detailed' ? 'Detailed' : 'Short'}):
+                  </p>
+                  <button
+                    onClick={() => setSummaries((prev) => ({ ...prev, [result.doc_id]: null }))}
+                    className="text-xs text-slate-500 hover:text-slate-700"
+                  >
+                    ✕ Clear
+                  </button>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
                   {summaries[result.doc_id]}
                 </p>
               </div>
             )}
 
             {/* Actions */}
-            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center space-x-4 text-sm">
+            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3 text-sm">
               <a
                 href={`http://localhost:8000/api/v1/documents/${result.doc_id}/download`}
                 target="_blank"
@@ -93,13 +105,23 @@ const SearchResults = ({ results, query }) => {
               >
                 View Document
               </a>
-              <button
-                onClick={() => handleSummarize(result.doc_id)}
-                disabled={summaryLoading[result.doc_id]}
-                className="text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {summaryLoading[result.doc_id] ? 'Summarizing...' : 'Summarize'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSummarize(result.doc_id, 'short')}
+                  disabled={summaryLoading[result.doc_id]}
+                  className="text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {summaryLoading[result.doc_id] && summaryTypes[result.doc_id] === 'short' ? 'Summarizing...' : 'Short Summary'}
+                </button>
+                <span className="text-slate-300">|</span>
+                <button
+                  onClick={() => handleSummarize(result.doc_id, 'detailed')}
+                  disabled={summaryLoading[result.doc_id]}
+                  className="text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {summaryLoading[result.doc_id] && summaryTypes[result.doc_id] === 'detailed' ? 'Summarizing...' : 'Detailed Summary'}
+                </button>
+              </div>
             </div>
           </div>
         ))}
