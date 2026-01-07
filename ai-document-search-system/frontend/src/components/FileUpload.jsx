@@ -14,8 +14,16 @@ const FileUpload = () => {
   const [success, setSuccess] = useState(null);
 
   const validateFile = (file) => {
-    if (file.type !== 'application/pdf') {
-      return 'Only PDF files are allowed';
+    // Allowed file types: PDF, TXT, MD
+    const allowedTypes = ['application/pdf', 'text/plain', 'text/markdown'];
+    const allowedExtensions = ['.pdf', '.txt', '.md'];
+
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+    const hasValidType = allowedTypes.includes(file.type);
+
+    if (!hasValidExtension && !hasValidType) {
+      return 'Only PDF, TXT, and MD files are allowed';
     }
 
     const maxSize = 10 * 1024 * 1024; // 10MB
@@ -91,58 +99,76 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full">
       <div
         className={`
-          relative border-2 rounded-xl p-10 text-center
-          transition-all duration-200 cursor-pointer
+          relative border-2 border-dashed rounded-2xl p-12 text-center
+          transition-all duration-300 cursor-pointer overflow-hidden
           ${isDragging
-            ? 'border-teal-600 bg-teal-50'
-            : 'border-slate-300 bg-white hover:border-slate-400'
+            ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-teal-100 scale-105 shadow-2xl shadow-teal-500/20'
+            : 'border-slate-300 bg-gradient-to-br from-white to-slate-50 hover:border-teal-400 hover:shadow-xl'
           }
-          ${uploading ? 'opacity-60 cursor-not-allowed' : ''}
+          ${uploading ? 'opacity-70 cursor-not-allowed' : ''}
         `}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
+        {/* Animated background pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIiIGZpbGw9IiMxNGI4YTYiIGZpbGwtb3BhY2l0eT0iLjA1Ii8+PC9nPjwvc3ZnPg==')] opacity-50"></div>
+
         <input
           type="file"
-          accept="application/pdf"
+          accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
           onChange={handleFileInput}
           disabled={uploading}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
         />
 
-        <div className="space-y-3">
-          <svg
-            className="mx-auto h-12 w-12 text-slate-400"
-            stroke="currentColor"
-            fill="none"
-            viewBox="0 0 48 48"
-            strokeWidth={1.5}
-          >
-            <path
-              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <div className="relative space-y-4">
+          {/* Icon with gradient background */}
+          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/30 transform transition-transform hover:scale-110">
+            <svg
+              className="h-10 w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+          </div>
 
           {uploading ? (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-900">Uploading...</p>
-              <div className="w-32 mx-auto h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-teal-700 animate-pulse"></div>
+            <div className="space-y-3">
+              <p className="text-base font-semibold text-slate-900">Uploading document...</p>
+              <div className="w-48 mx-auto h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-teal-500 to-teal-600 animate-pulse"></div>
               </div>
+              <p className="text-xs text-slate-500">Please wait</p>
             </div>
           ) : (
             <>
-              <p className="text-sm font-medium text-slate-900">
-                Drag & drop a PDF file here, or click to select
-              </p>
-              <p className="text-xs text-slate-500">Maximum file size: 10MB</p>
+              <div>
+                <p className="text-base font-semibold text-slate-900 mb-2">
+                  Drop your document here
+                </p>
+                <p className="text-sm text-slate-600">
+                  or click to browse files
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-4 text-xs text-slate-500">
+                <span className="px-3 py-1 bg-white rounded-full border border-slate-200">PDF</span>
+                <span className="px-3 py-1 bg-white rounded-full border border-slate-200">TXT</span>
+                <span className="px-3 py-1 bg-white rounded-full border border-slate-200">MD</span>
+                <span className="text-slate-400">•</span>
+                <span>Max 10MB</span>
+              </div>
             </>
           )}
         </div>

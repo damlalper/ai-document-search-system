@@ -15,19 +15,19 @@ const SearchBar = ({ onSearch, loading = false }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
-      <div className="flex gap-3">
-        <div className="relative flex-1">
+    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto">
+      <div className="flex gap-4">
+        <div className="relative flex-1 group">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Enter keyword and press Enter..."
             disabled={loading}
-            className="w-full px-4 py-3 pr-11 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent disabled:bg-slate-100 disabled:cursor-not-allowed transition-shadow"
+            className="w-full px-6 py-4 pr-14 bg-white border-2 border-slate-200 rounded-2xl text-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 shadow-sm group-hover:border-slate-300 transition-all duration-300"
           />
           <svg
-            className="absolute right-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400"
+            className="absolute right-5 top-1/2 transform -translate-y-1/2 h-6 w-6 text-slate-400 group-focus-within:text-teal-600 transition-colors duration-300"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -44,12 +44,12 @@ const SearchBar = ({ onSearch, loading = false }) => {
         <button
           type="submit"
           disabled={!query.trim() || loading}
-          className="px-6 py-3 bg-teal-700 text-white font-medium rounded-lg hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-700 focus:ring-offset-2 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+          className="px-8 py-4 bg-gradient-to-r from-teal-600 to-teal-700 text-white text-lg font-semibold rounded-2xl hover:from-teal-700 hover:to-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-500/20 disabled:bg-slate-300 disabled:cursor-not-allowed shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all duration-300"
         >
           {loading ? (
             <span className="flex items-center gap-2">
               <svg
-                className="animate-spin h-4 w-4"
+                className="animate-spin h-5 w-5"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -76,8 +76,8 @@ const SearchBar = ({ onSearch, loading = false }) => {
         </button>
       </div>
 
-      <p className="mt-3 text-sm text-slate-500 text-center">
-        Press Enter or click Search button to search documents
+      <p className="mt-4 text-sm text-slate-500 text-center font-medium">
+        Press <kbd className="mx-1 px-2 py-0.5 text-xs text-slate-600 bg-slate-100 border border-slate-300 rounded-md shadow-sm">Enter</kbd> or click Search to find documents
       </p>
     </form>
   );
