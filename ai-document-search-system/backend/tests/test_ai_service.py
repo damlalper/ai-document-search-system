@@ -63,12 +63,12 @@ def test_answer_question_factual_success(mock_groq_client):
     
     # Execute
     result = llm_service.answer_question("Context", "Question")
-    
+
     # Assert
     assert result == "Factual answer."
-    # CRITICAL: Temperature MUST be 0.0 to prevent hallucination
+    # Temperature is 0.3 for educational, pedagogical responses (updated from 0.0)
     call_kwargs = mock_groq_client.chat.completions.create.call_args.kwargs
-    assert call_kwargs['temperature'] == 0.0
+    assert call_kwargs['temperature'] == 0.3
 
 def test_answer_question_no_info(mock_groq_client):
     """Test that system returns predefined constant when no info found"""
