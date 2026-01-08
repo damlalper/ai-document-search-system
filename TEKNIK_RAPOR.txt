@@ -1,0 +1,287 @@
+BİL440 - YZ DESTEKLİ YAZILIM GELİŞTİRME
+FİNAL PROJESİ TEKNİK RAPORU
+
+PROJE ADI: AKILLI DOKÜMAN ARAMA VE ÖZETLEME SİSTEMİ
+(SMART DOCUMENT SEARCH & SUMMARIZATION SYSTEM)
+
+DÖNEM: 2025-2026 GÜZ
+TARİH: 07.01.2026
+
+HAZIRLAYANLAR:
+[Adınız Soyadınız] - [Öğrenci Numaranız]
+[Grup Arkadaşınızın Adı] - [Öğrenci Numarası]
+
+---
+
+İÇİNDEKİLER
+
+1. YÖNETİCİ ÖZETİ (EXECUTIVE SUMMARY)
+2. GİRİŞ VE PROJE KAPSAMI
+   2.1. Problem Tanımı ve Motivasyon
+   2.2. Projenin Amacı ve Çözüm Yaklaşımı
+   2.3. Hedef Kitle Analizi
+3. YÖNTEM: YZ DESTEKLİ HİBRİT GELİŞTİRME (METHODOLOGY)
+   3.1. Yapay Zeka Asistanlarının Rolleri ve Katkıları
+   3.2. Hibrit Kod Üretim Stratejisi (Örnek Vaka: LLM Servisi)
+   3.3. Prompt Engineering Teknikleri
+4. SİSTEM MİMARİSİ VE TEKNOLOJİ YIĞINI
+   4.1. Genel Mimari (High-Level Architecture)
+   4.2. Backend Mimarisi: FastAPI ve Modüler Yapı
+   4.3. Veri Yönetimi: Dosya Tabanlı Kalıcı Saklama Stratejisi
+   4.4. Arama Motoru: TF-IDF ve Vektör Uzayı Modeli Detayları
+5. RAG (RETRIEVAL-AUGMENTED GENERATION) BORU HATTI
+   5.1. Adım 1: Veri Alımı ve İşleme (Ingestion & Cleaning)
+   5.2. Adım 2: İndeksleme ve Erişim (Retrieval Logic)
+   5.3. Adım 3: Bağlam Oluşturma ve Üretim (Context & Generation)
+   5.4. Hallucination (Uydurma) Önleme Mekanizmaları
+6. FRONTEND MİMARİSİ VE KULLANICI DENEYİMİ (UX)
+   6.1. Teknoloji Seçimi: React 19, Vite ve Tailwind CSS 4.0
+   6.2. Tasarım Evrimi: "Design Failure"dan "Academic Minimalism"e
+   6.3. Bileşen Mimarisi ve Context API ile State Yönetimi
+7. GELİŞTİRME SÜRECİ VE VERSİYON GEÇMİŞİ (PROJECT CHRONICLES)
+   7.1. Faz 1: Temel Atma ve Dokümantasyon (Foundation)
+   7.2. Faz 2: Backend Çekirdek Geliştirme (Core Implementation)
+   7.3. Faz 3: Frontend Krizi ve Yeniden Yazım (The Refactor)
+   7.4. Faz 4: Akıllı Özelliklerin Entegrasyonu (Intelligence)
+   7.5. Faz 5: Kalite Güvence ve Test (QA)
+8. TEST STRATEJİSİ VE KALİTE GÜVENCE
+   8.1. Birim Testleri (Unit Tests) ve Mocking Stratejisi
+   8.2. Entegrasyon Testleri (Integration Tests)
+   8.3. Kritik Sınır Durum (Edge-Case) Testleri
+   8.4. YZ Tarafından Yapılan Hatalar ve Düzeltmeler (AI Failures)
+9. ETİK, GÜVENLİK VE LİSANS DEĞERLENDİRMESİ
+   9.1. Kod Lisansı Riski ve Açık Kaynak Uyumluluğu
+   9.2. Veri Gizliliği ve 3. Parti API Riskleri
+   9.3. Güvenlik Açıkları ve Prompt Injection Koruması
+   9.4. AI Hallucination Örnekleri (Vaka Analizleri)
+10. SONUÇ VE GELECEK ÇALIŞMALAR
+
+---
+
+1. YÖNETİCİ ÖZETİ (EXECUTIVE SUMMARY)
+
+Bu teknik rapor, BİL440 dersi final projesi kapsamında geliştirilen "Akıllı Doküman Arama ve Özetleme Sistemi"nin tüm teknik detaylarını, mimari kararlarını ve geliştirme sürecini kapsamlı bir şekilde ele almaktadır. Proje, kullanıcıların PDF, TXT ve MD formatındaki akademik veya teknik dokümanlarını yükleyebildikleri, içeriklerinde matematiksel tabanlı anlamsal arama yapabildikleri ve LLM (Large Language Model) desteği ile doğal dilde sorular sorarak yanıt alabildikleri modern bir web platformudur.
+
+Geliştirme süreci, "AI-Augmented Software Lifecycle" (YZ Destekli Yazılım Yaşam Döngüsü) prensiplerine tam uyumlulukla yürütülmüştür. Proje ekibi (İnsan Mühendisler), GitHub Copilot, Google Gemini ve Claude Code gibi yapay zeka asistanlarını sadece kod üreten araçlar olarak değil, mimari kararları tartışan birer "paydaş" olarak sürece dahil etmiştir. Bu süreçte YZ'nin sağladığı hız avantajlarının yanı sıra, yaptığı kritik hatalar (hallucinations), eski kütüphane önerileri ve güvenlik riskleri de şeffaf bir şekilde belgelenmiş ve raporlanmıştır.
+
+Sonuç olarak ortaya çıkan sistem; Python FastAPI tabanlı sağlam bir backend, React ve Tailwind CSS ile güçlendirilmiş kullanıcı dostu bir frontend ve Groq API (LLaMA 3.1) üzerinde çalışan optimize edilmiş bir RAG (Retrieval-Augmented Generation) boru hattından oluşmaktadır.
+
+---
+
+2. GİRİŞ VE PROJE KAPSAMI
+
+2.1. Problem Tanımı ve Motivasyon
+Bilgi çağında en büyük sorun veriye ulaşmak değil, veriyi anlamlandırmaktır. Araştırmacılar, hukukçular ve mühendisler her gün yüzlerce sayfalık teknik dokümanlarla (PDF) çalışmaktadır. Klasik "Ctrl+F" (Keyword Search) yöntemleri, kelime eşleşmesine dayalıdır ve bağlamı (context) anlayamaz. Örneğin, "siber saldırı" terimini arayan bir kullanıcı, metinde sadece "DDoS" veya "Phishing" geçiyorsa, aradığı bilgiye ulaşamayabilir. Ayrıca, 50 sayfalık bir makalenin sadece özetini çıkarmak veya "Bu makalede savunulan ana tez nedir?" sorusuna cevap bulmak, manuel yapıldığında ciddi bir zaman maliyetidir.
+
+2.2. Projenin Amacı ve Çözüm Yaklaşımı
+Projenin temel amacı, kullanıcının kendi doküman havuzu (Personal Knowledge Base) ile konuşabilmesini sağlayan akıllı, hızlı ve güvenilir bir sistem geliştirmektir.
+Çözüm yaklaşımı şu üç yeteneği birleştirir:
+*   **Anlamsal Analiz:** Dokümanların içeriğinin metin olarak çıkarılması ve vektörel uzayda (TF-IDF) temsil edilmesi.
+*   **Üretken Yapay Zeka (GenAI):** LLM'lerin dil yeteneklerini kullanarak, bulunan doküman parçalarından insan benzeri cevaplar ve özetler üretilmesi.
+*   **Şeffaflık (Explainability):** Sistemin verdiği her cevabın yanına, o cevabın hangi dokümanın hangi bölümünden alındığının kanıt (snippet) olarak eklenmesi.
+
+2.3. Hedef Kitle Analizi
+Proje, yoğun bilgi işleyen profesyoneller için tasarlanmıştır:
+*   **Akademik Araştırmacılar:** Literatür taraması yaparken makaleleri karşılaştırmak için.
+*   **Yazılım Geliştiriciler:** Legacy (eski) kod dokümantasyonları içinde kaybolmadan spesifik konfigürasyonları bulmak için.
+*   **Hukuk Profesyonelleri:** Dava dosyaları ve içtihat metinleri içinde emsal kararları analiz etmek için.
+
+---
+
+3. YÖNTEM: YZ DESTEKLİ HİBRİT GELİŞTİRME (METHODOLOGY)
+
+Bu proje, "AI-First" değil, "AI-Augmented" (YZ ile Güçlendirilmiş) bir metodoloji izlemiştir. Tek bir YZ modeline körü körüne güvenmek yerine, farklı modellerin (Gemini, Claude, Copilot) güçlü yönleri birleştirilmiş (Hybrid Intelligence) ve son karar daima insan mühendise bırakılmıştır.
+
+3.1. Yapay Zeka Asistanlarının Rolleri ve Katkıları
+
+*   **Google Gemini (The Architect):**
+    *   *Rolü:* Sistem Mimarı ve Dokümantasyon Uzmanı.
+    *   *Katkısı:* Projenin ilk aşamasında klasör yapısının (`backend/app/routers`, `services`, `models`) belirlenmesi. "Dosya tabanlı veri saklama" kararının maliyet/performans analizini yaparak veritabanı kullanımını reddetmesi.
+    *   *Somut Çıktı:* `ARCHITECTURE.md` ve `PRD.md` taslakları.
+
+*   **GitHub Copilot (The Pair Programmer):**
+    *   *Rolü:* Kod Tamamlayıcı ve Test Asistanı.
+    *   *Katkısı:* IDE içinde anlık kod önerileri. Özellikle `services/search_service.py` içindeki TF-IDF matris hesaplamaları ve `routers/documents.py` içindeki dosya yükleme (upload) mantığının yazımı.
+    *   *Kritik Katkı:* `NO_ANSWER_TEXT` sabitini önererek, LLM'in cevap bulamadığında uydurmasını engelleyen mekanizmayı koda eklemesi.
+
+*   **Claude Code (The Refactoring Agent & Frontend Lead):**
+    *   *Rolü:* Full-Stack Geliştirici ve Tasarımcı.
+    *   *Katkısı:* Backend'deki dağınık fonksiyonları `class` yapısına (`LLMService`) dönüştürerek "Object-Oriented" hale getirmesi. Frontend bileşenlerinin (React) modernizasyonu.
+    *   *Kritik Katkı:* RAG sisteminde "Context Building" (Bağlam Oluşturma) mantığını kurarak, çoklu doküman parçasının tek bir prompt'a nasıl sığdırılacağını optimize etmesi.
+
+3.2. Hibrit Kod Üretim Stratejisi (Örnek Vaka: LLM Servisi)
+Projenin en kritik dosyası olan `backend/app/services/llm_service.py`, tek bir YZ tarafından değil, üçünün ortak çalışmasıyla (insan orkestrasyonunda) yazılmıştır:
+1.  **API Entegrasyonu (Gemini):** Groq API istemcisinin (Client) doğru kurulumunu ve `RateLimitError` gibi spesifik hataların yakalanmasını sağladı.
+2.  **Sınıf Mimarisi (Claude):** Kodu bir `class LLMService` yapısına oturtarak, `summarize` ve `answer_question` metodlarını izole etti. Ayrıca "Variable Temperature" (Özet için 0.3, Detay için 0.7) mantığını ekledi.
+3.  **Güvenlik (Copilot):** Soru-Cevap fonksiyonunda `temperature=0.0` kullanılmasını önererek deterministik (halüsinasyonsuz) çıktılar alınmasını sağladı.
+
+3.3. Prompt Engineering Teknikleri
+LLM'den deterministik çıktılar almak için kod içinde (Code-Level) şu teknikler uygulanmıştır:
+*   **Role-Playing:** "You are an educational AI assistant helping users understand academic documents..."
+*   **Negative Constraint:** "ONLY use information from the provided context - NO external knowledge." (Asla dış bilgi kullanma).
+*   **Format Specification:** "Use bullet points for lists and numbered lists for sequential steps." (Biçimlendirme zorlaması).
+*   **Fallback Mechanism:** "If the answer is not in the context, respond EXACTLY with '{NO_ANSWER_TEXT}'." (Bilmiyorsan uydurma, bilmiyorum de).
+
+---
+
+4. SİSTEM MİMARİSİ VE TEKNOLOJİ YIĞINI
+
+4.1. Genel Mimari (High-Level Architecture)
+Sistem, modern "Monorepo" yapısında, birbirinden bağımsız çalışan Frontend ve Backend servislerinden oluşur. İletişim RESTful API (JSON) üzerinden sağlanır. Mimarinin "Stateless" (Durumsuz) olması, sunucu maliyetlerini düşürmüş ve ölçeklenebilirliği artırmıştır.
+
+*   **Frontend:** Single Page Application (SPA). React 19, Vite, Tailwind CSS 4.0.
+*   **Backend:** Python 3.11, FastAPI (Asynchronous).
+*   **AI Provider:** Groq Cloud (LLaMA 3.1 - 8B Model).
+*   **Search Engine:** Scikit-Learn (TF-IDF).
+
+4.2. Backend Mimarisi: FastAPI ve Modüler Yapı
+Backend (Commit: `ad6ab2a`), "Separation of Concerns" (İlgi Ayrımı) prensibine göre katmanlara ayrılmıştır:
+*   **Routers (`app/routers/`):** Sadece HTTP isteklerini karşılar, parametreleri doğrular ve servisleri çağırır. İş mantığı içermez.
+*   **Services (`app/services/`):** İş mantığının (Business Logic) döndüğü yerdir. `pdf_service` (PDF okuma), `search_service` (Arama), `llm_service` (YZ).
+*   **Models (`app/models/`):** Pydantic (`BaseModel`) kullanılarak veri şemaları tanımlanmıştır. Bu sayede API'ye gelen hatalı JSON verileri otomatik reddedilir.
+*   **Config (`app/config.py`):** Tüm ayarlar (API Key, Klasör yolları) `pydantic-settings` ile `.env` dosyasından okunur. Hard-coded veri yoktur.
+
+4.3. Veri Yönetimi: Dosya Tabanlı Kalıcı Saklama Stratejisi
+Projede ilişkisel veritabanı (SQL) veya vektör veritabanı (Pinecone/Chroma) yerine, **Dosya Sistemi ve JSON Metadata** kullanılmasına karar verilmiştir (Decision Log, Analiz Aşaması).
+*   *Neden?* Proje, "Portable" (Taşınabilir) olmalıdır. Veritabanı kurulumu gerektirmeden `git clone` ve `run` ile çalışabilmelidir.
+*   *Yapı:*
+    *   `data/uploads/`: Kullanıcının yüklediği orijinal PDF dosyaları (Binary).
+    *   `data/extracted/`: İşlenmiş ve temizlenmiş metin (.txt) dosyaları (Cache/Önbellek).
+    *   `data/metadata.json`: Dosyaların ID'leri, isimleri, sayfa sayıları ve yükleme tarihlerini tutan hafif veritabanı.
+
+4.4. Arama Motoru: TF-IDF ve Vektör Uzayı Modeli
+`search_service.py` dosyası, Scikit-Learn kütüphanesinin `TfidfVectorizer` sınıfını kullanarak kendi arama motorunu oluşturur.
+*   **Tokenizasyon:** Metinler kelimelere bölünür, İngilizce "stop words" (the, is, at) temizlenir.
+*   **Matris Oluşumu:** Her doküman bir vektör olarak temsil edilir. Kelimelerin frekansı (TF) ve doküman genelindeki nadirliği (IDF) hesaplanır.
+*   **Cosine Similarity:** Kullanıcı sorgusu da vektöre çevrilir. Sorgu vektörü ile doküman vektörleri arasındaki açı (benzerlik) hesaplanır. En yüksek skora sahip 5 doküman parçası "Alakalı Bağlam" olarak seçilir.
+*   *Avantajı:* OpenAI Embeddings gibi maliyetli yöntemlere göre tamamen ücretsiz, hızlı ve CPU üzerinde çalışabilir olmasıdır.
+
+---
+
+5. RAG (RETRIEVAL-AUGMENTED GENERATION) BORU HATTI
+
+Bu projenin teknik kalbi, `backend/app/routers/ai.py` dosyasındaki RAG mekanizmasıdır. Bu boru hattı (pipeline) şu adımları izler:
+
+5.1. Adım 1: Veri Alımı ve İşleme (Ingestion & Cleaning)
+Kullanıcı PDF yüklediğinde (`POST /documents/upload`), `pdf_service.py` devreye girer. PyMuPDF (`fitz`) kütüphanesi ile PDF'in her sayfasındaki metin blokları koordinatsız (plain text) olarak çıkarılır. Ardından `clean_text` fonksiyonu ile gereksiz boşluklar, sayfa numaraları ve header/footer bilgileri temizlenir. Temiz metin `extracted/` klasörüne kaydedilir.
+
+5.2. Adım 2: İndeksleme ve Erişim (Retrieval Logic)
+`search_service.rebuild_index()` metodu çalışarak yeni eklenen metni TF-IDF matrisine dahil eder.
+Kullanıcı bir soru sorduğunda (`POST /ai/qa`):
+1.  Soru metni temizlenir.
+2.  TF-IDF ile tüm dokümanlar taranır.
+3.  Benzerlik skoru 0'dan büyük olan dokümanlar sıralanır.
+4.  En alakalı (Top-K) 5 doküman seçilir.
+
+5.3. Adım 3: Bağlam Oluşturma ve Üretim (Context & Generation)
+Seçilen 5 dokümanın metinleri, diskten okunur. Bu metinler, aralarına `---DOCUMENT_BOUNDARY---` ayracı konularak tek bir devasa "Context String" (Bağlam Metni) haline getirilir.
+Ardından Groq API'ye şu şablonla istek atılır:
+> "Sistem Mesajı: Sen bir eğitim asistanısın. Sadece aşağıda verilen CONTEXT'i kullan."
+> "Kullanıcı Mesajı: Context: [Birleştirilmiş Metin] ... Soru: [Kullanıcı Sorusu]"
+
+5.4. Hallucination (Uydurma) Önleme Mekanizmaları
+RAG sistemlerinin en büyük riski olan uydurmayı önlemek için çok katmanlı bir koruma stratejisi uygulanmıştır:
+1.  **Temperature Kontrolü:** Soru-Cevap (QA) modülünde `temperature=0.0` kullanılarak modelin "yaratıcılığı" tamamen kapatılmıştır. Model, veri neyse onu söylemeye zorlanmıştır.
+2.  **Kaynak Doğrulama (Source Attribution):** Sistemin verdiği cevabın yanına, o cevabın hangi dokümandan geldiği (`filename`) ve ilgili metin parçası (`excerpt`) eklenir. Kullanıcı cevabı kontrol edebilir.
+3.  **Strict Prompting:** Modelin eğitim verisindeki (External Knowledge) bilgilerini kullanması `System Prompt` içinde kesin bir dille yasaklanmıştır.
+
+---
+
+6. FRONTEND MİMARİSİ VE KULLANICI DENEYİMİ (UX)
+
+6.1. Teknoloji Seçimi: React 19, Vite ve Tailwind CSS 4.0
+Frontend, performans, geliştirici deneyimi ve modern standartlar gözetilerek **Vite** üzerinde **React 19** ile kurgulanmıştır. CSS framework'ü olarak, utility-first yaklaşımı sunan **Tailwind CSS 4.0** (Beta/RC sürümü) kullanılmıştır. State yönetimi için harici kütüphaneler (Redux) yerine, React'in kendi **Context API** (`DocumentContext.jsx`) özelliği kullanılarak yalınlık sağlanmıştır.
+
+6.2. Tasarım Evrimi: "Design Failure"dan "Academic Minimalism"e
+Projenin tasarım süreci, YZ ve İnsan işbirliğinin en net görüldüğü alandır (Bkz: `AI_DECISION_LOG.md`).
+*   *İlk Deneme (Claude Code):* Claude, "Ocean Blue + Sand" renk paletini kullanarak bir tasarım önerdi. Ancak kod çalıştırıldığında, `amber-50` arka plan renginin çok soluk olduğu ve kartların sınırlarının görünmediği fark edildi. Bu bir "Design Execution Failure" idi.
+*   *Müdahale (İnsan + ChatGPT):* Tasarım tamamen çöpe atıldı. ChatGPT ile "Academic Minimalism" felsefesi belirlendi. Notion ve GitHub dokümantasyonlarından esinlenen; `Slate-50` arka plan, `Teal-700` vurgu renkleri ve "Quiet UI" (Sessiz Arayüz) kartları ile tasarım baştan yazıldı.
+
+6.3. Bileşen Mimarisi ve Context API ile State Yönetimi
+Uygulama, "Smart & Dumb Components" mimarisine sahiptir:
+*   **Smart Components (Pages):** `App.jsx`, genel durumu (`activeTab`) yönetir.
+*   **Context:** `DocumentContext.jsx`, yüklenen dokümanların listesini (`documents`), yükleme durumunu (`loading`) ve hata mesajlarını (`error`) tüm uygulamaya dağıtır.
+*   **Dumb Components:** `DocumentList`, `SearchResults` gibi bileşenler sadece Context'ten gelen veriyi gösterir (Render).
+
+---
+
+7. GELİŞTİRME SÜRECİ VE VERSİYON GEÇMİŞİ (PROJECT CHRONICLES)
+
+Git loglarına dayanarak projenin gelişim hikayesi 5 ana fazda özetlenmiştir:
+
+7.1. Faz 1: Temel Atma ve Dokümantasyon (`25d9482` - `1872335`)
+İlk commitlerde proje iskeleti oluşturuldu. `PRD.md`, `ARCHITECTURE.md` ve `RULES.md` gibi kural setleri belirlendi. Bu aşamada koddan çok planlama yapıldı. YZ'nin rolü burada "Danışman" idi.
+
+7.2. Faz 2: Backend Çekirdek Geliştirme (`ad6ab2a` - `7767d4c`)
+FastAPI projesi başlatıldı. `pdf_service` ve `search_service` modülleri yazıldı. İlk başta sadece metin yükleme varken, PDF desteği (PyMuPDF) eklendi. YZ'nin rolü "Kod Üretici"ye dönüştü.
+
+7.3. Faz 3: Frontend Krizi ve Yeniden Yazım (`2341edd` - `6ffbfc1`)
+Frontend entegrasyonu sırasında **Tailwind CSS 4.0 Konfigürasyon Hatası** (Commit: `6ffbfc1`) yaşandı. AI (Claude), Tailwind 4.0 kullanmasına rağmen Tailwind 3.0 config dosyası oluşturdu. Bu hata, arayüzün stilsiz görünmesine neden oldu. İnsan müdahalesiyle `tailwind.config.js` silinip CSS-based konfigürasyona geçildi. Ayrıca Claude'un ilk tasarım denemesi (Amber teması) reddedilip, tüm frontend (Commit: `557a803`) baştan yazıldı.
+
+7.4. Faz 4: Akıllı Özelliklerin Entegrasyonu (`fb00441` - `2d829de`)
+Projenin "Akıllı" özellikleri olan Q&A (Soru-Cevap) ve Özetleme (Summarize) fonksiyonları eklendi. `QuestionAnswer.jsx` bileşeni geliştirildi. Bu aşamada Backend tarafında Pydantic şema hataları (Duplicate Schema) tespit edilip düzeltildi (Commit: `2d829de`).
+
+7.5. Faz 5: Kalite Güvence ve Test (`addb60d` - Günümüz)
+Projenin son aşamasında birim testleri ve edge-case testleri yazıldı. `pytest` altyapısı kuruldu. Hatalı AI çıktıları (Hallucination) raporlandı.
+
+---
+
+8. TEST STRATEJİSİ VE KALİTE GÜVENCE
+
+8.1. Birim Testleri (Unit Tests) ve Mocking Stratejisi
+`backend/tests/` klasöründe yer alan testler, dış bağımlılıkları (Groq API, Dosya Sistemi) `unittest.mock` kütüphanesi ile taklit eder (Mocking).
+*   *Strateji:* "Gerçek API çağırma, taklit et."
+*   *Neden?* API ücretlidir, internet bağlantısı kopabilir veya API çökebilir. Testler deterministik olmalıdır.
+*   *Örnek:* `test_ai_service.py` içinde `mock_groq_client` fixture'ı, Groq API'nin cevabını simüle eder.
+
+8.2. Entegrasyon Testleri (Integration Tests)
+`test_routers.py`, FastAPI'nin `TestClient` özelliğini kullanarak API endpoint'lerine sanal HTTP istekleri atar. Dosya yükleme, listeleme ve silme senaryolarının uçtan uca çalıştığını doğrular. Burada dosya sistemi işlemleri için `pytest`'in `tmp_path` (geçici klasör) özelliği kullanılmıştır.
+
+8.3. Kritik Sınır Durum (Edge-Case) Testleri
+`backend/tests/test_edge_cases.py` dosyası ile 3 kritik senaryo doğrulanmıştır:
+1.  **Hallucination Check:** "Mars'ın başkenti nedir?" gibi dokümanda olmayan saçma bir soru sorulduğunda, sistemin uydurmak yerine `NO_ANSWER_TEXT` döndüğü doğrulanmıştır.
+2.  **Scanned PDF:** Metin içermeyen (sadece resim olan) PDF yüklendiğinde sistemin çökmediği, boş metin döndürdüğü doğrulanmıştır.
+3.  **Large Document:** Token limitini zorlayan metinlerde sistemin hata yönetimi test edilmiştir.
+
+8.4. YZ Tarafından Yapılan Hatalar ve Düzeltmeler (AI Failures)
+Bu proje, YZ'nin kusursuz olmadığını kanıtlamıştır.
+*   **Hata 1 (PyMuPDF Mocking):** Gemini, `test_pdf_service` yazarken `fitz` kütüphanesinin iterable yapısını (`for page in doc`) unuttu. Testler "Boş metin" hatasıyla patladı. İnsan müdahalesiyle mock objesine `__len__` ve `__getitem__` eklendi.
+*   **Hata 2 (Client Patching):** Gemini, `llm_service` testinde `client` nesnesinin global olduğunu sandı. Oysa `client`, `LLMService` sınıfının bir üyesiydi (`self.client`). Bu hata `patch.object` kullanılarak düzeltildi.
+
+---
+
+9. ETİK, GÜVENLİK VE LİSANS DEĞERLENDİRMESİ
+
+9.1. Kod Lisansı Riski ve Açık Kaynak Uyumluluğu
+Projede kullanılan kütüphaneler (FastAPI, React, Tailwind, Scikit-learn) **MIT** veya **Apache 2.0** gibi "Permissive" (İzin verici) lisanslara sahiptir. GPL gibi "Viral" (Bulaşıcı) lisanslı kütüphane kullanılmamıştır. Bu, projenin ticari veya özel amaçla kullanımında yasal risk oluşturmaz.
+
+9.2. Veri Gizliliği ve 3. Parti API Riskleri
+En büyük etik risk, kullanıcı dokümanlarının 3. parti bir servis (Groq Cloud) ile paylaşılmasıdır.
+*   **Risk:** Hassas verilerin (Kişisel Veriler, Ticari Sırlar) buluta gönderilmesi.
+*   **Önlem:** Sistem "Stateless" (Durumsuz) tasarlanmıştır. Backend'de sohbet geçmişi veritabanına kaydedilmez. Groq API'nin verileri eğitim için kullanmadığı (API Policy) varsayılmıştır. Kullanıcı arayüzünde "Hassas veri yüklemeyin" uyarısı (Disclaimer) varsayılmıştır.
+
+9.3. Güvenlik Açıkları ve Prompt Injection Koruması
+*   **Dosya Yükleme:** Sadece `.pdf`, `.txt`, `.md` uzantılarına izin verilir. Sunucuda çalıştırılabilir dosya (`.exe`, `.php`) yüklenmesi backend seviyesinde (`documents.py`) engellenmiştir.
+*   **Prompt Injection:** Kullanıcının "Sistemi hackle", "Önceki talimatları unut" gibi komutlarına karşı System Prompt koruması mevcuttur. RAG mimarisi, modelin sadece verilen `Context` metnine odaklanmasını sağlayarak bu riski azaltır.
+
+9.4. AI Hallucination Örnekleri (Vaka Analizleri)
+Geliştirme sürecinde yaşanan gerçek halüsinasyonlar:
+1.  **Olmayan Kütüphane:** Copilot, test yazarken `import pytest-groq` satırını önerdi. Böyle bir kütüphane PyPI'da yoktur.
+2.  **Yanlış Versiyon:** Claude, Tailwind 4.0 için Tailwind 3.0 konfigürasyonu (`tailwind.config.js`) yazdı.
+3.  **Eski Bilgi:** Gemini, Groq API için kullanımdan kalkan (`deprecated`) bir model ismini (`llama3-8b-8192`) konfigürasyona ekledi. Sistem `500 Error` verdi.
+
+---
+
+10. SONUÇ VE GELECEK ÇALIŞMALAR
+
+Bu proje ile, YZ destekli yazılım geliştirme teknikleri kullanılarak çalışan, test edilmiş ve belgelenmiş bir "Akıllı Doküman Arama Sistemi" başarıyla hayata geçirilmiştir. Proje, sadece kod yazmak değil, AI ile "pair programming" yapmak, onun hatalarını yakalamak, mimari kararları insan gözetiminde almak ve "AI Hallucination" gerçeğiyle yüzleşmek üzerine kurulu öğretici bir deneyim olmuştur.
+
+Elde Edilen Temel Kazanımlar:
+*   RAG mimarisinin sıfırdan inşası ve optimizasyonu.
+*   AI asistanlarının (Copilot/Gemini/Claude) birbiriyle çelişen önerilerinin yönetilmesi (Decision Log).
+*   Modern web teknolojileri (FastAPI, React 19, Tailwind 4) ile hızlı prototipleme.
+
+Gelecek Çalışmalar (Future Work):
+*   **OCR Entegrasyonu:** Taranmış (resim) PDF'ler için Tesseract OCR eklenmesi.
+*   **Vector DB:** In-memory arama yerine ChromaDB gibi profesyonel vektör veritabanına geçiş.
+*   **Çoklu Dil Desteği:** Arayüzün ve özetlemenin farklı dillerde (İngilizce/Türkçe) dinamik çalışması.
