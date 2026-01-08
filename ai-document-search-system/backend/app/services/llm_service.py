@@ -121,33 +121,42 @@ class LLMService:
         Raises:
             Exception: If LLM API call fails
         """
-        # Strict prompt to prevent hallucination (Claude's approach)
+        # Enhanced prompt for educational, structured answers (ChatGPT-style)
         system_prompt = (
-            "You are a question-answering assistant for a document search system. "
+            "You are an educational AI assistant helping users understand academic documents. "
+            "Your goal is to provide clear, well-structured, and pedagogical answers.\n\n"
             "CRITICAL RULES:\n"
-            "1. ONLY use information from the provided context to answer questions\n"
+            "1. ONLY use information from the provided context - NO external knowledge\n"
             "2. If the answer is not in the context, respond EXACTLY with: "
             f"'{NO_ANSWER_TEXT}'\n"
-            "3. Do NOT use external knowledge or make assumptions\n"
-            "4. Be concise and factual\n"
-            "5. Quote relevant parts of the context when possible"
+            "3. Structure your answers for clarity:\n"
+            "   - Start with a direct definition or main point\n"
+            "   - Use bullet points (•) for lists and key features\n"
+            "   - Break complex topics into digestible paragraphs\n"
+            "   - Use numbered lists (1., 2., 3.) for sequential steps or examples\n"
+            "4. Be pedagogical and explanatory - help the user understand, don't just list facts\n"
+            "5. Use clear, simple language - academic but accessible\n"
+            "6. When listing features or characteristics, use bullet points\n"
+            "7. For definitions or concepts, provide context and examples from the documents"
         )
 
         user_prompt = (
-            f"Context from documents:\n{context}\n\n"
-            f"Question: {question}\n\n"
-            f"Answer based ONLY on the context above:"
+            f"Documents content:\n{context}\n\n"
+            f"User question: {question}\n\n"
+            "Provide a well-structured, educational answer based ONLY on the documents above. "
+            "Use bullet points for lists, break into clear paragraphs, and explain concepts pedagogically."
         )
 
         try:
-            # Temperature 0.0 for deterministic, factual answers (Copilot's idea)
+            # Temperature 0.3 for structured, pedagogical answers (educational style)
+            # Higher than 0.0 (too robotic) but lower than 0.7 (too creative)
             response: ChatCompletion = self.client.chat.completions.create(
                 model=self.default_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.0,  # Deterministic mode - no creativity needed
+                temperature=0.3,  # Balanced: structured but natural
                 max_tokens=settings.max_tokens
             )
 

@@ -39,51 +39,61 @@ def save_metadata(metadata: dict) -> None:
 @router.post("/documents/upload", response_model=DocumentUploadResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(file: UploadFile = File(...)):
     """
-    Upload a PDF document and extract text
+    Upload a document (PDF or text) and extract text
 
     Steps:
-    1. Validate file is PDF
-    2. Save PDF to uploads/
-    3. Extract text using PyMuPDF (no AI)
+    1. Validate file type (.pdf, .txt, .md)
+    2. Save file to uploads/
+    3. Extract text (PDF: PyMuPDF, Text: direct read)
     4. Save extracted text to extracted/
     5. Update metadata.json
     6. Rebuild search index
     """
     # Validate file type
-    if not file.filename.endswith('.pdf'):
+    ALLOWED_EXTENSIONS = {'.pdf', '.txt', '.md'}
+    file_ext = Path(file.filename).suffix.lower()
+
+    if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF files are supported"
+            detail=f"Only {', '.join(ALLOWED_EXTENSIONS)} files are supported"
         )
 
     # Generate unique document ID
     doc_id = str(uuid.uuid4())
 
-    # Save uploaded PDF
-    pdf_path = settings.upload_dir / f"{doc_id}.pdf"
+    # Save uploaded file with appropriate extension
+    uploaded_file_path = settings.upload_dir / f"{doc_id}{file_ext}"
     try:
         settings.upload_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(pdf_path, 'wb') as f:
+        with open(uploaded_file_path, 'wb') as f:
             content = await file.read()
             f.write(content)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save PDF: {str(e)}"
+            detail=f"Failed to save file: {str(e)}"
         )
 
-    # Extract text from PDF (classical method, no AI)
+    # Extract text based on file type
     try:
-        extracted_data = extract_text_from_pdf(pdf_path)
-        full_text = extracted_data['full_text']
-        page_count = extracted_data['page_count']
+        if file_ext == '.pdf':
+            # PDF: Use PyMuPDF (classical method, no AI)
+            extracted_data = extract_text_from_pdf(uploaded_file_path)
+            full_text = extracted_data['full_text']
+            page_count = extracted_data['page_count']
+        else:
+            # Text files (.txt, .md): Direct read
+            with open(uploaded_file_path, 'r', encoding='utf-8') as f:
+                full_text = f.read()
+            page_count = None  # Text files don't have pages
     except Exception as e:
         # Cleanup uploaded file
-        pdf_path.unlink(missing_ok=True)
+        uploaded_file_path.unlink(missing_ok=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to extract text from PDF: {str(e)}"
+            detail=f"Failed to extract text from file: {str(e)}"
         )
 
     # Save extracted text for search indexing
@@ -91,17 +101,23 @@ async def upload_document(file: UploadFile = File(...)):
         save_extracted_text(doc_id, full_text)
     except Exception as e:
         # Cleanup files
-        pdf_path.unlink(missing_ok=True)
+        uploaded_file_path.unlink(missing_ok=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to save extracted text: {str(e)}"
         )
 
-    # Get PDF metadata
+    # Get file metadata
     try:
-        pdf_metadata = get_pdf_metadata(pdf_path)
+        if file_ext == '.pdf':
+            file_metadata = get_pdf_metadata(uploaded_file_path)
+        else:
+            # For text files, calculate file size manually
+            file_metadata = {
+                'file_size': uploaded_file_path.stat().st_size
+            }
     except Exception as e:
-        pdf_metadata = {}
+        file_metadata = {}
 
     # Update metadata.json
     metadata = load_metadata()
@@ -112,7 +128,7 @@ async def upload_document(file: UploadFile = File(...)):
         "filename": file.filename,
         "uploaded_at": uploaded_at.isoformat(),
         "page_count": page_count,
-        "file_size": pdf_metadata.get('file_size', 0)
+        "file_size": file_metadata.get('file_size', 0)
     }
 
     metadata['documents'].append(doc_metadata)
@@ -186,7 +202,7 @@ async def get_document(doc_id: str):
 @router.get("/documents/{doc_id}/download")
 async def download_document(doc_id: str):
     """
-    Download the original PDF file
+    Download the original document file (PDF or text)
     """
     metadata = load_metadata()
     documents = metadata.get('documents', [])
@@ -204,18 +220,29 @@ async def download_document(doc_id: str):
             detail=f"Document with ID {doc_id} not found"
         )
 
-    # Check if PDF file exists
-    pdf_path = settings.upload_dir / f"{doc_id}.pdf"
-    if not pdf_path.exists():
+    # Determine file extension from original filename
+    file_ext = Path(doc_found['filename']).suffix.lower()
+
+    # Find the uploaded file with correct extension
+    file_path = settings.upload_dir / f"{doc_id}{file_ext}"
+    if not file_path.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"PDF file not found for document {doc_id}"
+            detail=f"File not found for document {doc_id}"
         )
+
+    # Determine media type based on extension
+    media_type_map = {
+        '.pdf': 'application/pdf',
+        '.txt': 'text/plain',
+        '.md': 'text/markdown'
+    }
+    media_type = media_type_map.get(file_ext, 'application/octet-stream')
 
     # Return file for download
     return FileResponse(
-        path=pdf_path,
-        media_type='application/pdf',
+        path=file_path,
+        media_type=media_type,
         filename=doc_found['filename']
     )
 
@@ -229,11 +256,10 @@ async def delete_document(doc_id: str):
     documents = metadata.get('documents', [])
 
     # Find and remove document from metadata
-    doc_found = False
+    doc_found = None
     for i, doc in enumerate(documents):
         if doc['doc_id'] == doc_id:
-            documents.pop(i)
-            doc_found = True
+            doc_found = documents.pop(i)
             break
 
     if not doc_found:
@@ -242,11 +268,14 @@ async def delete_document(doc_id: str):
             detail=f"Document with ID {doc_id} not found"
         )
 
+    # Determine file extension from original filename
+    file_ext = Path(doc_found['filename']).suffix.lower()
+
     # Delete physical files
-    pdf_path = settings.upload_dir / f"{doc_id}.pdf"
+    uploaded_file_path = settings.upload_dir / f"{doc_id}{file_ext}"
     text_path = settings.extracted_dir / f"{doc_id}.txt"
 
-    pdf_path.unlink(missing_ok=True)
+    uploaded_file_path.unlink(missing_ok=True)
     text_path.unlink(missing_ok=True)
 
     # Save updated metadata
