@@ -6,15 +6,15 @@
 
 ---
 
-## US-1: PDF Document Upload
+## US-1: Multi-Format Document Upload (PDF, TXT, MD)
 
 **Priority:** Must Have
-**AI Contributors:** ChatGPT, Gemini, Copilot
+**AI Contributors:** ChatGPT, Gemini, Copilot, Claude Code
 
 ### User Story
 As an academic researcher,
-I want to upload PDF documents to the system,
-So that I can analyze and search them digitally.
+I want to upload documents in multiple formats (PDF, TXT, MD),
+So that I can analyze and search different types of content digitally.
 
 ### Acceptance Criteria (BDD)
 
@@ -23,6 +23,12 @@ So that I can analyze and search them digitally.
 **Then** doküman sistemde saklanmalı
 **And** doküman listesinde adıyla görünmelidir
 **And** yükleme başarısızsa kullanıcı bilgilendirilmelidir
+
+**Given** kullanıcı .txt veya .md dosyası yüklediğinde
+**When** dosya yükleme tamamlandığında
+**Then** metin içeriği başarıyla extract edilmeli
+**And** doküman listesinde dosya tipi ikonu gösterilmeli (PDF/TXT/MD)
+**And** text dosyaları için page_count null olmalıdır
 
 **Given** geçersiz dosya tipi (örn: .exe, .docx)
 **When** kullanıcı yüklemeye çalıştığında
@@ -133,15 +139,15 @@ So that I can analyze the document without reading it fully.
 
 ---
 
-## US-6: Document-Based Q&A (AI)
+## US-6: Document-Based Q&A with Source Attribution (AI + RAG)
 
 **Priority:** Must Have
-**AI Contributors:** ChatGPT, Gemini, Copilot
+**AI Contributors:** ChatGPT, Gemini, Copilot, Claude Code
 
 ### User Story
 As an academic researcher,
-I want to ask questions in natural language,
-So that I can get answers based only on document content.
+I want to ask questions in natural language and receive answers with clear source attribution,
+So that I can verify the information and trust the AI-generated responses.
 
 ### Acceptance Criteria (BDD)
 
@@ -151,9 +157,17 @@ So that I can get answers based only on document content.
 **And** cevap hangi doküman(lar)a dayandığını belirtmelidir
 **And** içerik dışı bilgi üretilmemelidir (AI hallucination prevention)
 
+**Given** AI cevap ürettiğinde
+**When** cevap ekranda gösterildiğinde
+**Then** her cevapla birlikte kaynak dokümanların listesi gösterilmelidir
+**And** kaynak dokümanlardan alınan excerpt'ler (text snippets) vurgulanmalıdır
+**And** kullanıcı kaynak dokümanı tıklayarak orijinal içeriğe gidebilmelidir
+**And** RAG pipeline'ın hangi dokümanları kullandığı şeffaf olmalıdır
+
 **Given** soru doküman kapsamı dışında ise
 **When** sistem yanıtlayamıyorsa
 **Then** "Dokümanda yanıt bulunamadı" şeklinde açık geri bildirim döner
+**And** NO_ANSWER_TEXT constant kullanılarak hallucination engellenir
 
 **Given** belirsiz veya çok genel bir soru varsa
 **When** kullanıcı soruyu gönderirse
@@ -238,18 +252,81 @@ So that I can understand why certain documents ranked higher and trust the searc
 
 ---
 
+## US-10: Bulk Document Summarization
+
+**Priority:** Nice to Have
+**AI Contributors:** Claude Code
+
+### User Story
+As a researcher managing multiple documents,
+I want to summarize all documents at once,
+So that I can get an overview of my entire document collection efficiently.
+
+### Acceptance Criteria (BDD)
+
+**Given** sistemde birden fazla doküman yüklüyken
+**When** kullanıcı "Tümünü Özetle" butonuna bastığında
+**Then** tüm dokümanlar için kısa özetler paralel olarak üretilmelidir
+**And** her özet doküman adıyla birlikte gösterilmelidir
+**And** özetler generation sırasında progress indicator gösterilmelidir
+
+**Given** bulk summarization başlatıldığında
+**When** işlem devam ederken
+**Then** kullanıcı işlemi iptal edebilmelidir (cancel button)
+**And** zaten üretilmiş özetler korunmalıdır
+
+**Given** bir veya daha fazla doküman özetlenirken hata oluşursa
+**When** işlem tamamlandığında
+**Then** başarılı özetler gösterilmeli ve başarısız olanlar için hata mesajı verilmelidir
+
+---
+
+## US-11: AI Hallucination Example Logging & Analysis
+
+**Priority:** Must Have (Project Requirement)
+**AI Contributors:** ChatGPT, Claude Code
+
+### User Story
+As a developer and researcher,
+I want to log and review incorrect AI-generated outputs,
+So that I can analyze AI limitations, document them in the project report, and improve system reliability.
+
+### Acceptance Criteria (BDD)
+
+**Given** AI bir hallucination (yanlış/uydurma cevap) ürettiğinde
+**When** sistem bunu tespit ettiğinde veya kullanıcı raporladığında
+**Then** hallucination örneği AI_DECISION_LOG.md dosyasına kaydedilmelidir
+**And** hata türü (API hallucination, pattern inconsistency, config error) sınıflandırılmalıdır
+**And** root cause (kök sebep) açıklanmalıdır
+
+**Given** geliştirme sürecinde en az 1 AI execution error tespit edildiğinde
+**When** error raporlandığında
+**Then** şu bilgiler dokümante edilmelidir:
+- Kullanılan AI aracı
+- AI'nın önerisi/çıktısı
+- Hatanın ne olduğu
+- İnsan müdahalesinin nasıl yapıldığı
+- Öğrenilen ders (lesson learned)
+
+**Given** proje teslimi hazırlanırken
+**When** AI Decision Log gözden geçirildiğinde
+**Then** en az 16 AI execution error belgelenmiş olmalıdır (Project requirement met)
+**And** her error için gerekçe ve çözüm açıkça belirtilmelidir
+
+---
+
 ## Summary
 
 | Priority | Count | User Stories |
 |----------|-------|-------------|
-| Must Have | 4 | US-1, US-2, US-3, US-6 |
+| Must Have | 5 | US-1, US-2, US-3, US-6, US-11 |
 | Should Have | 2 | US-5, US-8 |
-| Nice to Have | 3 | US-4 (can be upgraded to Must), US-7, US-9 |
+| Nice to Have | 4 | US-4 (can be upgraded to Must), US-7, US-9, US-10 |
 
-**Total:** 9 User Stories
+**Total:** 11 User Stories
 
 **AI Contribution:**
-- ChatGPT: Structure, BDD format, hallucination prevention criteria
+- ChatGPT: Structure, BDD format, hallucination prevention criteria, AI error logging
 - Gemini: Snippet view suggestion, Turkish-English hybrid clarity
 - Copilot: Error handling scenarios, timeout handling, detailed edge cases
-- Claude Code: Progress feedback UX, relevance score transparency (explainability)
+- Claude Code: Progress feedback UX, relevance score transparency (explainability), bulk operations, source attribution
