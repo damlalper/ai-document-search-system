@@ -1,0 +1,301 @@
+# AI Prompt Examples - BİL440 Final Project
+# AI Document Search System
+# Proje geliştirme sürecinde kullanılan örnek promptlar
+
+================================================================================
+AŞAMA: ANALİZ
+================================================================================
+
+[1] ChatGPT - PRD (Product Requirements Document) Oluşturma
+---------------------------------------------------
+PROMPT:
+"BİL440 dersi final projesi için Akıllı Doküman Arama ve Özetleme Sistemi
+geliştiriyoruz. PDF'teki proje gereksinimlerini analiz ederek bir Product
+Requirements Document (PRD) hazırla. Şu konuları içermeli:
+- Proje kapsamı (scope)
+- Temel özellikler (core features)
+- AI kullanılacak ve kullanılmayacak alanlar
+- Kapsam dışı bırakılanlar (out of scope)"
+
+AI ÇIKTISI:
+ PRD başarıyla oluşturuldu
+- Zorunlu özellikler: PDF upload, TF-IDF search, AI Q&A, Summarization
+- AI kullanım sınırları: Sadece Q&A ve özetleme (PDF parsing AI'sız)
+- Kapsam dışı: User authentication, multi-language support
+
+DOSYA: docs/PRD.md
+
+---------------------------------------------------
+
+[2] Gemini - Mimari Yaklaşım ve Sistem Bileşenleri
+---------------------------------------------------
+PROMPT:
+"Akıllı Doküman Arama sistemi için backend mimarisi öner. Sistemde:
+- FastAPI backend
+- PDF text extraction (classical, no AI)
+- TF-IDF based keyword search
+- AI-powered Q&A and summarization (Groq LLM)
+Klasör yapısı ve bileşen organizasyonu nasıl olmalı?"
+
+AI ÇIKTISI:
+ Minimal services/ tabanlı yapı önerildi
+- Backend: app/services/, app/routers/, app/models/
+- Data: data/uploads/, data/extracted/
+ Ancak AI kullanım sınırları insan kararıyla netleştirildi
+
+DOSYA: docs/ARCHITECTURE.md
+KARAR: AI_DECISION_LOG.md Row 4 (Kısmen kabul edildi)
+
+---------------------------------------------------
+
+[3] ChatGPT - AI Kullanım Sınırlarının Belirlenmesi
+---------------------------------------------------
+PROMPT:
+"Projede AI'ı hangi adımlarda kullanmalıyız? PDF parsing, text extraction,
+keyword search, Q&A ve summarization adımlarını değerlendir. Hangi adımlar
+AI gerektirmez (deterministik)?"
+
+AI ÇIKTISI:
+ "AI tüm süreçte kullanılabilir" önerisi REDDEDİLDİ
+ İNSAN KARARI: PDF parsing, keyword search, kaynak atfı AI dışı bırakıldı
+- Gerekçe: Deterministik işlemler, hata riski, açıklanabilirlik
+
+DOSYA: docs/JOINT_DECISIONS.md
+KARAR: AI_DECISION_LOG.md Row 5 (Kabul edildi ama revize edildi)
+
+================================================================================
+AŞAMA: TASARIM
+================================================================================
+
+[4] Gemini, ChatGPT, Copilot - Framework Seçimi
+---------------------------------------------------
+PROMPT:
+"Akıllı doküman sistemi için frontend teknolojileri öner:
+- Framework (React, Vue, Angular?)
+- Build tool (Vite, Webpack, CRA?)
+- State management (Redux, Context, Zustand?)"
+
+AI ÇIKTILARI:
+ 3 AI de React + Vite önerdi (consensus)
+ Gemini TypeScript önerdi (kısmen reddedildi - zaman kısıtı)
+ Context API kabul edildi (Redux overkill)
+
+KARAR: AI_DECISION_LOG.md Row 14 (Kabul edildi)
+
+---------------------------------------------------
+
+[5] Gemini, ChatGPT, Copilot - Renk Paleti Seçimi
+---------------------------------------------------
+PROMPT:
+"Akademik doküman arama sistemi için renk paleti öner. Hedef kullanıcı:
+araştırmacılar, akademisyenler. Uzun okuma seansları için rahat olmalı."
+
+AI ÇIKTILARI:
+ Gemini: Indigo-Purple (AI temalı) - REDDEDİLDİ
+ ChatGPT: Klasik Mavi-Beyaz - REDDEDİLDİ
+ Copilot: Klasik Mavi-Beyaz - REDDEDİLDİ
+ İNSAN KARARI: Ocean Blue + Sand (2025 trend araştırması)
+
+Ancak daha sonra:
+ Ocean Blue + Sand implementation'da başarısız oldu (Row 31)
+ FINAL: Neutral + Teal (ChatGPT'nin Academic Minimalism önerisi)
+
+KARAR: AI_DECISION_LOG.md Row 23, 31, 33 (3 kez revize edildi)
+
+---------------------------------------------------
+
+[6] ChatGPT, Gemini, Copilot, Claude - User Stories
+---------------------------------------------------
+PROMPT:
+"BDD (Given/When/Then) formatında user stories oluştur. Sistem:
+- PDF/TXT/MD upload
+- TF-IDF search
+- AI Q&A with source attribution
+- Short/detailed summarization
+Must Have, Should Have, Nice to Have öncelikleri belirt."
+
+AI ÇIKTILARI:
+ HİBRİT YAKLAŞIM - 4 AI'nın gücü birleştirildi
+- ChatGPT: BDD structure, hallucination prevention
+- Gemini: Snippet view suggestion
+- Copilot: Error handling scenarios
+- Claude: Progress feedback, explainability
+
+SONUÇ: 11 user story (9 yerine, geliştirme sırasında genişletildi)
+
+DOSYA: docs/USER_STORIES.md
+KARAR: AI_DECISION_LOG.md Row 36-38 (Hibrit)
+
+================================================================================
+AŞAMA: GELİŞTİRME
+================================================================================
+
+[7] Gemini, Copilot, Claude - LLM Service Implementation
+---------------------------------------------------
+PROMPT:
+"Groq API kullanarak LLM service class yaz. Özellikler:
+- Summarization (short: 150 words, detailed: 400-600 words)
+- Q&A (RAG context-based, hallucination prevention)
+- Error handling (RateLimitError, APIError)
+- Temperature control (educational responses için 0.3)"
+
+AI ÇIKTILARI:
+ Gemini: Doğru Groq API syntax (client.chat.completions.create())
+ Copilot: YANLIŞ API (client.generate() - böyle bir method YOK)
+ Copilot: NO_ANSWER_TEXT constant fikri (mükemmel - hallucination önleme)
+ Claude: Class-based yapı, variable temperature, strict prompts
+
+FINAL KOD: Hibrit (3 AI'nın en iyi özellikleri)
+- Gemini API syntax + Copilot constant + Claude class structure
+
+DOSYA: backend/app/services/llm_service.py
+KARAR: AI_DECISION_LOG.md Row 13 (Hibrit - KRİTİK DOSYA)
+
+---------------------------------------------------
+
+[8] Claude Code - Tailwind CSS 4.x Kurulumu
+---------------------------------------------------
+PROMPT:
+"Tailwind CSS 4.x kurulumu yap. Package.json'a ekle, postcss config yaz,
+index.css'i düzenle."
+
+AI ÇIKTISI:
+ YANLIŞ - Tailwind 3.x formatında config yazdı
+- postcss.config.js: `tailwindcss: {}` (eski format)
+- Tailwind 4.x: `@tailwindcss/postcss` paketi gerekli
+
+HATA: Vite dev server çalıştı ama stil görünmedi (beyaz ekran)
+
+İNSAN MÜDAHALESİ:
+- npm install -D @tailwindcss/postcss
+- postcss.config.js güncellendi
+- tailwind.config.js silindi (Tailwind 4.x'te gerek yok)
+
+KARAR: AI_DECISION_LOG.md Row 21 (REDDEDİLDİ - 3. AI EXECUTION ERROR)
+
+---------------------------------------------------
+
+[9] Gemini - Test Senaryosu Üretimi
+---------------------------------------------------
+PROMPT:
+"LLM service için pytest unit testleri yaz. Edge cases:
+- Hallucination prevention (context-only response)
+- Scanned PDF handling (empty text)
+- Large document truncation (>100k characters)
+- API timeout handling"
+
+AI ÇIKTILARI:
+ 6 senaryo kabul edildi:
+- test_summarize_short, test_qa_factual, test_hallucination_prevention
+- test_empty_input, test_api_error_handling, test_scanned_pdf_handling
+
+ Copilot: test_real_api_call (canlı API - izole değil) - REDDEDİLDİ
+ Gemini: test_summary_in_french (kapsam dışı) - REDDEDİLDİ
+ Gemini: pytest-groq kütüphanesi önerdi - BÖYLE BİR KÜTÜPHANE YOK (hallucination)
+
+DOSYA: backend/tests/test_edge_cases.py
+KARAR: AI_DECISION_LOG.md Row 43 (6 kabul, 2 red, 2 düzeltme)
+
+================================================================================
+AŞAMA: TEST & BUG FIX
+================================================================================
+
+[10] Gemini - PDF Service Mock Hatası
+---------------------------------------------------
+PROMPT:
+"PyMuPDF (fitz) kütüphanesini mockla. PDF text extraction testi yaz:
+- extract_text_from_pdf()
+- Page iteration: for page in doc
+- Page text extraction: page.get_text()"
+
+AI ÇIKTISI:
+ Mock objesine __len__ ve __getitem__ eklemeyi unuttu
+- for page in doc döngüsü çalışmadı (iterable değil)
+
+İNSAN MÜDAHALESİ:
+- mock_doc.__len__.return_value = 1
+- mock_doc.__getitem__.return_value = mock_page
+
+KARAR: AI_DECISION_LOG.md Row 46 (14. AI EXECUTION ERROR)
+
+---------------------------------------------------
+
+[11] Gemini, Copilot, Claude - Decommissioned Model
+---------------------------------------------------
+PROMPT:
+"Groq API config yaz. Model olarak llama3 ailesi kullan."
+
+AI ÇIKTILARI:
+ 3 AI de llama3-8b-8192 hard-code etti
+- Model kullanımdan kalkmış (decommissioned)
+- Runtime error: 500 Internal Server Error
+
+İNSAN MÜDAHALESİ:
+- Model ismi llama-3.1-8b-instant olarak güncellendi
+- .env dosyasına environment variable eklendi
+
+KARAR: AI_DECISION_LOG.md Row 42 (11. AI EXECUTION ERROR)
+
+================================================================================
+ÖNEMLİ PROMPT PATTERN'LERİ
+================================================================================
+
+ BAŞARILI PATTERN:
+1. Spesifik gereksinimler ver (teknoloji stack, constraint'ler)
+2. "Neden" sorusunu sor (ChatGPT: "Neden React Query overkill?")
+3. Alternatifler iste (3 AI'dan aynı soruyu sor, karşılaştır)
+4. Edge case'leri explicit belirt
+
+ BAŞARISIZ PATTERN:
+1. Genel sorular ("En iyi framework ne?") - context eksik
+2. Versiyon belirtmeden ("Tailwind kurulumu") - breaking change riski
+3. Deprecated API kullanımı (AI'nın bilgisi cut-off date'e kadar)
+4. "Tam çözüm ver" (AI copy-paste yerine hibrit yaklaşım)
+
+================================================================================
+AI HALLUCİNATION ÖRNEKLERİ (Prompt → Yanlış Çıktı)
+================================================================================
+
+[1] pytest-groq kütüphanesi uydurması (Copilot)
+PROMPT: "Groq API test için mock kütüphanesi öner"
+ÇIKTI: from pytest_groq import mock_groq
+GERÇEK: Böyle bir kütüphane PyPI'da YOK
+
+[2] client.generate() API hallucination (Copilot)
+PROMPT: "Groq SDK kullanarak LLM çağrısı yap"
+ÇIKTI: client.generate(prompt=...)
+GERÇEK: Groq SDK'da generate() metodu YOK, chat.completions.create() olmalı
+
+[3] load_extracted_text() fonksiyon hallucination (Copilot)
+PROMPT: "PDF service'ten extracted text oku"
+ÇIKTI: from app.services.pdf_service import load_extracted_text
+GERÇEK: Böyle bir fonksiyon pdf_service.py'da hiç yazılmamıştı
+
+[4] Tailwind 4.x config hallucination (Claude Code)
+PROMPT: "Tailwind CSS 4.x kurulumu"
+ÇIKTI: tailwind.config.js (Tailwind 3.x formatı)
+GERÇEK: Tailwind 4.x'te config dosyası @theme CSS directive ile yapılıyor
+
+================================================================================
+DERS ÇIKARIMLAR
+================================================================================
+
+1. AI önerisini DOĞRUDAN kullanma - kod review şart
+2. 3 farklı AI'ya aynı soruyu sor, karşılaştır
+3. Deprecated/decommissioned API'leri manuel kontrol et
+4. Visual output (UI) test et - AI renk tonlarını "göremez"
+5. Framework version breaking changes'i AI bilmiyor olabilir
+6. Hibrit yaklaşım > tek AI'ya güvenme
+7. "Neden?" sorusunu sor - gerekçesiz öneri tehlikeli
+
+================================================================================
+SONUÇ
+================================================================================
+
+TOPLAM PROMPT SAYISI: 100+ (yaklaşık)
+BAŞARILI AI KARARLARI: 28 (%58)
+REDDEDİLEN AI ÖNERİLERİ: 10 (%21)
+HİBRİT KARARLAR: 10 (%21)
+
+AI kullanımı hızlandırdı ama kalite kontrolü insan gerektirdi.
+Mühendis refleksi: "AI ile yazılım geliştiren, AI ile kod yazan değil."
