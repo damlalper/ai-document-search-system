@@ -9,6 +9,7 @@ from typing import List, Dict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from unidecode import unidecode  # Turkish character normalization
 
 from app.config import settings
 from app.services.pdf_service import load_extracted_text
@@ -19,10 +20,21 @@ class SearchService:
     """Classical TF-IDF based search service (no AI)"""
 
     def __init__(self):
+        # Normalize Turkish characters for better search results
+        # İ→i, Ş→s, Ç→c, Ğ→g, Ü→u, Ö→o
+        def turkish_normalizer(text):
+            """
+            Normalize Turkish and English text for TF-IDF.
+            Converts Turkish characters to ASCII equivalents.
+            Example: "BİTİRME" → "bitirme", "çalışma" → "calisma"
+            """
+            return unidecode(text).lower()
+
         self.vectorizer = TfidfVectorizer(
             max_features=settings.tfidf_max_features,
             stop_words='english',
-            lowercase=True
+            lowercase=False,  # We handle lowercasing in preprocessor
+            preprocessor=turkish_normalizer
         )
         self.doc_vectors = None
         self.doc_ids = []
