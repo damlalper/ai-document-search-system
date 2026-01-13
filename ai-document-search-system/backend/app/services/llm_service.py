@@ -45,6 +45,7 @@ class LLMService:
     def summarize(self, text: str, summary_type: str = "short") -> str:
         """
         Generate document summary using LLM
+        Handles large documents by chunking if needed
 
         Args:
             text: Full document text to summarize
@@ -56,6 +57,15 @@ class LLMService:
         Raises:
             Exception: If LLM API call fails
         """
+        # Estimate token count (rough: 1 token ≈ 4 characters)
+        estimated_tokens = len(text) // 4
+        max_input_tokens = 4000  # Safe limit for Groq free tier (leaves room for response)
+
+        # If document is too large, chunk it and summarize in parts
+        if estimated_tokens > max_input_tokens:
+            logger.info(f"Document too large ({estimated_tokens} tokens), using chunked summarization")
+            return self._summarize_large_document(text, summary_type)
+
         # Variable temperature based on summary type (Claude's idea)
         temperature = 0.3 if summary_type == "short" else 0.7
 
@@ -103,6 +113,113 @@ class LLMService:
         except Exception as e:
             logger.error(f"Unexpected error in summarize: {str(e)}")
             raise Exception(f"Summarization failed: {str(e)}")
+
+    def _summarize_large_document(self, text: str, summary_type: str = "short") -> str:
+        """
+        Summarize large documents using hierarchical chunking approach
+
+        Strategy:
+        1. Split document into chunks (each ~3000 tokens)
+        2. Summarize each chunk
+        3. Combine chunk summaries
+        4. Generate final summary from combined summaries
+
+        Args:
+            text: Large document text
+            summary_type: "short" or "detailed"
+
+        Returns:
+            Final summary text
+        """
+        # Split into words for chunking
+        words = text.split()
+        chunk_size = 3000  # tokens (rough: ~12000 characters)
+        word_chunk_size = chunk_size * 4  # Convert token estimate to words
+
+        chunks = []
+        for i in range(0, len(words), word_chunk_size):
+            chunk = ' '.join(words[i:i + word_chunk_size])
+            chunks.append(chunk)
+
+        logger.info(f"Split document into {len(chunks)} chunks for summarization")
+
+        # Summarize each chunk
+        chunk_summaries = []
+        temperature = 0.3 if summary_type == "short" else 0.7
+
+        for idx, chunk in enumerate(chunks):
+            try:
+                system_prompt = (
+                    "You are a document analysis assistant. Summarize the following section "
+                    "of a larger document, focusing on key information."
+                )
+
+                user_prompt = (
+                    f"Summarize this section (part {idx+1} of {len(chunks)}) in 2-3 sentences:\n\n"
+                    f"{chunk}"
+                )
+
+                response: ChatCompletion = self.client.chat.completions.create(
+                    model=self.default_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=temperature,
+                    max_tokens=300  # Shorter summaries for chunks
+                )
+
+                chunk_summary = response.choices[0].message.content.strip()
+                chunk_summaries.append(chunk_summary)
+                logger.info(f"Summarized chunk {idx+1}/{len(chunks)}")
+
+            except Exception as e:
+                logger.error(f"Failed to summarize chunk {idx+1}: {str(e)}")
+                # Continue with other chunks even if one fails
+                continue
+
+        if not chunk_summaries:
+            raise Exception("Failed to summarize any chunks of the document")
+
+        # Combine chunk summaries into final summary
+        combined_summaries = "\n\n".join(chunk_summaries)
+
+        # Generate final summary from chunk summaries
+        if summary_type == "short":
+            final_prompt = (
+                f"Based on these section summaries, provide a concise overall summary "
+                f"(3-5 sentences) of the entire document:\n\n{combined_summaries}"
+            )
+        else:
+            final_prompt = (
+                f"Based on these section summaries, provide a detailed overall summary "
+                f"(1-2 paragraphs) of the entire document, highlighting key points:\n\n{combined_summaries}"
+            )
+
+        system_prompt = (
+            "You are a document analysis assistant. Synthesize the following section summaries "
+            "into a coherent overall summary."
+        )
+
+        try:
+            response: ChatCompletion = self.client.chat.completions.create(
+                model=self.default_model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": final_prompt}
+                ],
+                temperature=temperature,
+                max_tokens=settings.max_tokens
+            )
+
+            final_summary = response.choices[0].message.content.strip()
+            logger.info(f"Generated final summary from {len(chunks)} chunks")
+            return final_summary
+
+        except Exception as e:
+            logger.error(f"Failed to generate final summary: {str(e)}")
+            # Fallback: return combined chunk summaries
+            return combined_summaries
 
     def answer_question(self, context: str, question: str) -> str:
         """
