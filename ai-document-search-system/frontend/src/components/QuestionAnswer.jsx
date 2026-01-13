@@ -137,11 +137,11 @@ const QuestionAnswer = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4">
               {[
-                "Low-code nedir ve nasıl kullanılır?",
-                "Kalite ölçüm metrikleri nelerdir?",
-                "Dokümanın ana fikrini özetle.",
-                "Bu projenin temel amacı nedir?",
-                "Yazılım geliştirme süreçleri nelerdir?"
+                "Bu dokümanda hangi konular işleniyor?",
+                "Ana fikir ve amaç nedir?",
+                "En önemli noktalar nelerdir?",
+                "Bu belgede hangi yöntemler kullanılmış?",
+                "Sonuç ve çıkarımlar nelerdir?"
               ].map((suggestion, idx) => (
                 <button
                   key={idx}
